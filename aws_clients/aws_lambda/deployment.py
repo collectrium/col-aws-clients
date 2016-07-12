@@ -11,6 +11,8 @@ import boto3
 from botocore.exceptions import ClientError
 from git import Repo
 
+from aws_clients.aws_lambda.client import LambdaClient
+
 logger = logging.getLogger("AWSLambda")
 
 LIB_DIRS = (
@@ -28,8 +30,12 @@ class LambdaPackage(object):
         self.pkg_venv = os.path.join(self.workspace, 'env')
         self.venv_pip = 'bin/pip'
         self.repo = repository or '.'
-        self.requirements = (aws_lambda_config.pop('binary_requirements') if
-                             'binary_requirements' in aws_lambda_config else None)
+        self.requirements = (aws_lambda_config.pop('binary_requirements')
+                             if 'binary_requirements' in aws_lambda_config
+                             else None)
+        self.ignored_packages = (aws_lambda_config.pop('ignored_packages')
+                                 if 'ignored_packages' in aws_lambda_config
+                                 else [])
         self.lambda_config = aws_lambda_config
 
     def create_deployment_package(self):
@@ -42,6 +48,11 @@ class LambdaPackage(object):
     def add_env_libs_and_src(self):
         Repo(path=self.repo).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
+        for package in self.ignored_packages:
+            try:
+                shutil.rmtree(os.path.join(self.workspace, package))
+            except OSError:
+                pass
         package_path = get_python_lib()
         self.__add_package_from_path(package_path)
 
@@ -119,7 +130,9 @@ class Deployer(object):
     def __init__(
             self,
             aws_lambda_config,
-            aws_lambda_client,
+            region_name,
+            aws_access_key_id,
+            aws_secret_access_key,
             version=None,
             repository=None
     ):
@@ -137,13 +150,14 @@ class Deployer(object):
              },
              'binary_requirements':{
                     'psycopg2==2.5.3': ("libpq.so",)
-             }
+             },
+             'ignored_packages': ('tests', 'testlib', 'debug')
         ]
-        :param aws_lambda_client:
-        :type aws_clients.aws_lambda.LambdaClient
         """
         self.zipfile = LambdaPackage(aws_lambda_config, repository)
-        self.client = aws_lambda_client
+        self.client = LambdaClient(region_name,
+                                   aws_access_key_id,
+                                   aws_secret_access_key)
         self.lambda_config = aws_lambda_config
         self.version = version
         self.arns = {}
