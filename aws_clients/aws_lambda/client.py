@@ -1,8 +1,6 @@
 from botocore.client import Config
 
-from aws_clients.aws_client import BaseAWSClient, BaseAWSClientException
-
-
+from aws_clients.aws_client import BaseAWSClient
 
 
 class LambdaClient(BaseAWSClient):
@@ -32,7 +30,8 @@ class LambdaClient(BaseAWSClient):
             handler,
             zip_file,
             timeout=60,
-            memory_size=128
+            memory_size=128,
+            version=None
     ):
         """
         Create AWS Lambda function
@@ -47,7 +46,7 @@ class LambdaClient(BaseAWSClient):
         iam = BaseAWSClient('iam', **self.instance.settings)
         role = iam.instance.Role(role_name)
 
-        self.instance.create_function(
+        response = self.instance.create_function(
             FunctionName=function_name,
             Runtime='python2.7',
             Role=role.arn,
@@ -58,17 +57,30 @@ class LambdaClient(BaseAWSClient):
             Timeout=timeout,
             MemorySize=memory_size,
         )
+        if version:
+            self.publish_version_alias(
+                function_name,
+                version,
+                response['CodeSha256']
+            )
 
-    def update_lambda_function_code(self, function_name, zip_file, ):
+    def update_lambda_function_code(self, function_name, zip_file,
+                                    version=None):
         """
         Update AWS Lambda function code from zip package
         :param zip_file: source code package
         :return:
         """
-        self.instance.update_function_code(
+        response = self.instance.update_function_code(
             FunctionName=function_name,
             ZipFile=open(zip_file).read(),
         )
+        if version:
+            self.publish_version_alias(
+                function_name,
+                version,
+                response['CodeSha256']
+            )
 
     def update_lambda_function_config(
             self,
@@ -119,4 +131,15 @@ class LambdaClient(BaseAWSClient):
         """
         self.instance.delete_function(
             FunctionName=function_name
+        )
+
+    def publish_version_alias(self, function_name, version_name, code_sha256):
+        response = self.instance.publish_version(
+            FunctionName=function_name,
+            CodeSha256=code_sha256
+        )
+        self.instance.create_alias(
+            FunctionName=function_name,
+            Name=version_name,
+            FunctionVersion=response['Version'],
         )
