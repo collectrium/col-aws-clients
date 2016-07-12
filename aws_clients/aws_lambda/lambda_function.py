@@ -23,7 +23,8 @@ class LambdaFunction(object):
                  function_name,
                  region_name,
                  aws_access_key_id,
-                 aws_secret_access_key):
+                 aws_secret_access_key,
+                 version=None):
         """
         :param function_name: AWS Lambda function name
         :type str
@@ -42,6 +43,7 @@ class LambdaFunction(object):
         )
         self.function_name = function_name
         self.function_arn = None
+        self.version = version
         try:
             response = self.client.instance.get_function(
                 FunctionName=function_name,
@@ -51,6 +53,7 @@ class LambdaFunction(object):
             )
         except ClientError as exc:
             logger.exception("[AWS Lambda] {}".format(exc.message))
+            raise LambdaFunctionNotFound
 
     def __call__(self, payload, async=True):
         """
@@ -58,16 +61,19 @@ class LambdaFunction(object):
         :param async: Flag for async call
         :return: None for async call or AWS Lambda function result
         """
-        if not self.function_arn:
-            raise LambdaFunctionNotFound
+
         invocation = "Event" if async else "RequestResponse"
         start_time = time.time()
-        response = self.client.instance.invoke(
+        kwargs = dict(
             FunctionName=self.function_name,
             Payload=json.dumps(payload),
             InvocationType=invocation
         )
-        logger.info("[AWS Lambda]Lambda invoking time %s",
+        if self.version:
+            kwargs.update(Qualifier=self.version)
+
+        response = self.client.instance.invoke(**kwargs)
+        logger.info("[AWS Lambda]Lambda)invoking time %s",
                     str(time.time() - start_time))
         if not async and 'Payload' in response:
             result = response['Payload'].read()

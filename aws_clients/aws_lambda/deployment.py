@@ -20,27 +20,6 @@ LIB_DIRS = (
     "/lib/x86_64-linux-gnu/"
 )
 
-binary_requirements = [
-
-]
-
-"""
-Sample lambda config:
-
-[  'function_1': {  # function name
-         'role_name':'lambda_basic_execution', # IAM role for lambda
-         'handler': 'lambda_module.function_1',  # handler, must receive event  and context as argument
-         'shedule_expression': "rate(5 minutes)", # set for periodic lambda call
-         'memory_size': 128,
-         'timeout': 60,
-
-     },
-     'binary_requirements':{
-            'psycopg2==2.5.3': ("libpq.so",)
-     }
-]
-"""
-
 
 class LambdaPackage(object):
     def __init__(self, aws_lambda_config, repository=None):
@@ -146,6 +125,20 @@ class Deployer(object):
     ):
         """
         :param aws_lambda_config:
+        Sample lambda config:
+
+        [  'function_1': {  # function name
+                 'role_name':'lambda_basic_execution', # IAM role for lambda
+                 'handler': 'lambda_module.function_1',  # handler, must receive event  and context as argument
+                 'shedule_expression': "rate(5 minutes)", # set for periodic lambda call
+                 'memory_size': 128,
+                 'timeout': 60,
+
+             },
+             'binary_requirements':{
+                    'psycopg2==2.5.3': ("libpq.so",)
+             }
+        ]
         :param aws_lambda_client:
         :type aws_clients.aws_lambda.LambdaClient
         """
@@ -153,6 +146,7 @@ class Deployer(object):
         self.client = aws_lambda_client
         self.lambda_config = aws_lambda_config
         self.version = version
+        self.arns = {}
 
     def deploy(self):
         self.upload()
@@ -162,13 +156,13 @@ class Deployer(object):
     def upload(self):
         for function_name, function_config in self.lambda_config.items():
             try:
-                self.client.update_lambda_function_code(
+                response = self.client.update_lambda_function_code(
                     function_name,
                     self.zipfile,
                     self.version
                 )
             except ClientError:
-                self.client.create_lambda_function(
+                response = self.client.create_lambda_function(
                     function_name,
                     role_name=function_config['role_name'],
                     handler=function_config['handler'],
@@ -177,29 +171,30 @@ class Deployer(object):
                     memory_size=function_config.get('memory_size'),
                     version=self.version
                 )
+            self.arns[function_name] = response['FunctionArn']
 
     def set_shedule(self):
         settings = self.client.settings
         client = boto3.client('events', **settings)
-        for lambda_name, lambda_config in self.function_config.items():
-            expression = lambda_config.get('shedule_expression')
+        for function_name, function_config in self.lambda_config.items():
+            expression = function_config.get('shedule_expression')
             if expression:
                 response = client.put_rule(
-                    Name=lambda_name,
+                    Name=function_name,
                     ScheduleExpression=expression,
                     State='ENABLED'
                 )
 
                 client.put_targets(
-                    Rule=lambda_name,
+                    Rule=function_name,
                     Targets=[
                         {'Id': 'b5b5e45d-87ad-491f-82f9-e387dd4bc247',
-                         'Arn': self.arns[lambda_name]
+                         'Arn': self.arns[function_name]
                          }
                     ]
                 )
                 permission = dict(
-                    FunctionName=lambda_name,
+                    FunctionName=function_name,
                     StatementId='b5b5e45d-87ad-491f-82f9-e387dd4bc247',
                     Action="lambda:InvokeFunction",
                     Principal="events.amazonaws.com",
@@ -210,4 +205,3 @@ class Deployer(object):
                     self.client.add_permission(**permission)
                 except ClientError:
                     pass
-
