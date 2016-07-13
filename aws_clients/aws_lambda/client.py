@@ -1,4 +1,6 @@
+import boto3
 from botocore.client import Config
+from botocore.exceptions import ClientError
 
 from aws_clients.aws_client import BaseAWSClient
 
@@ -35,8 +37,8 @@ class LambdaClient(BaseAWSClient):
             role_name,
             handler,
             zip_file,
-            timeout=60,
-            memory_size=128,
+            timeout,
+            memory_size,
             version=None
     ):
         """
@@ -49,8 +51,8 @@ class LambdaClient(BaseAWSClient):
         :return:
         """
 
-        iam = BaseAWSClient('iam', **self.instance.settings)
-        role = iam.instance.Role(role_name)
+        iam = boto3.resource('iam', **self.settings)
+        role = iam.Role(role_name)
 
         response = self.instance.create_function(
             FunctionName=function_name,
@@ -60,8 +62,8 @@ class LambdaClient(BaseAWSClient):
             Code=dict(
                 ZipFile=open(zip_file).read()
             ),
-            Timeout=timeout,
-            MemorySize=memory_size,
+            Timeout=timeout or 60,
+            MemorySize=memory_size or 128,
         )
         if version:
             self.publish_version_alias(
@@ -69,6 +71,7 @@ class LambdaClient(BaseAWSClient):
                 version,
                 response['CodeSha256']
             )
+        return response['FunctionArn']
 
     def update_lambda_function_code(self, function_name, zip_file,
                                     version=None):
@@ -87,6 +90,7 @@ class LambdaClient(BaseAWSClient):
                 version,
                 response['CodeSha256']
             )
+        return response['FunctionArn']
 
     def update_lambda_function_config(
             self,
@@ -108,8 +112,8 @@ class LambdaClient(BaseAWSClient):
             FunctionName=function_name
         )
         if role_name:
-            iam = BaseAWSClient('iam', **self.settings)
-            role = iam.instance.Role(role_name)
+            iam = boto3.resource('iam', **self.settings)
+            role = iam.Role(role_name)
             kwargs.update(
                 Role=role.arn
             )
@@ -147,6 +151,13 @@ class LambdaClient(BaseAWSClient):
         :param code_sha256:
         :return:
         """
+        try:
+            self.instance.delete_alias(
+                FunctionName=function_name,
+                Name=version_name,
+            )
+        except ClientError:
+            pass
         response = self.instance.publish_version(
             FunctionName=function_name,
             CodeSha256=code_sha256
@@ -160,7 +171,7 @@ class LambdaClient(BaseAWSClient):
     def add_api_gateway_invoke_permission(self, function_name, ):
 
         permission = dict(
-            FunctionName=function_name,
+            FunctionName=function_name+':development',
             StatementId="58f7cfba-2278-4583-baae-227c582c2023",
             Action="lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",

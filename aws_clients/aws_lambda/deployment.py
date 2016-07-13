@@ -138,7 +138,7 @@ class LambdaDeployer(object):
             aws_access_key_id,
             aws_secret_access_key,
             version=None,
-            repository=None
+            zip_file=None
     ):
         """
         :param aws_lambda_config:
@@ -166,9 +166,7 @@ class LambdaDeployer(object):
         :param aws_secret_access_key: AWS credentials
         :param version: AWS Lambda function version alias
         """
-        self.zipfile = LambdaPackage(
-            aws_lambda_config, repository
-        ).create_deployment_package()
+        self.zipfile = zip_file
 
         self.client = LambdaClient(region_name,
                                    aws_access_key_id,
@@ -180,18 +178,19 @@ class LambdaDeployer(object):
     def deploy(self):
         self._upload()
         self._set_shedule()
+        self._add_permissions()
         # TODO: add SNS and S3 source
 
     def _upload(self):
         for function_name, function_config in self.lambda_config.items():
             try:
-                response = self.client.update_lambda_function_code(
+                function_arn = self.client.update_lambda_function_code(
                     function_name,
                     self.zipfile,
                     self.version
                 )
-            except ClientError:
-                response = self.client.create_lambda_function(
+            except ClientError as cle:
+                function_arn = self.client.create_lambda_function(
                     function_name,
                     role_name=function_config['role_name'],
                     handler=function_config['handler'],
@@ -200,7 +199,7 @@ class LambdaDeployer(object):
                     memory_size=function_config.get('memory_size'),
                     version=self.version
                 )
-            self.arns[function_name] = response['FunctionArn']
+            self.arns[function_name] = function_arn
 
     def _set_shedule(self):
         settings = self.client.settings
@@ -238,10 +237,13 @@ class LambdaDeployer(object):
     def _add_permissions(self):
         for function_name, function_config in self.lambda_config.items():
             event_sources = function_config.get('event_sources', None)
-            if event_sources and 's3' in event_sources:
-                self.client.add_s3_invoke_permission(
-                    function_name,
-                    event_sources['s3']['bucket_name']
-                )
-            elif event_sources and 'api_gateway' in event_sources:
-                self.client.add_api_gateway_invoke_permission(function_name)
+            try:
+                if event_sources and 's3' in event_sources:
+                    self.client.add_s3_invoke_permission(
+                        function_name,
+                        event_sources['s3']['bucket_name']
+                    )
+                elif event_sources and 'api_gateway' in event_sources:
+                    self.client.add_api_gateway_invoke_permission(function_name)
+            except ClientError:
+                pass
