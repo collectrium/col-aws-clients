@@ -24,9 +24,13 @@ LIB_DIRS = (
 
 
 class LambdaPackage(object):
+    """
+    Helper for creation code package
+    """
+
     def __init__(self, aws_lambda_config, repository=None):
         self.workspace = tempfile.mkdtemp()
-        self.zipfile = os.path.join(self.workspace, 'lambda.zip')
+        self.zip_file = os.path.join(self.workspace, 'lambda.zip')
         self.pkg_venv = os.path.join(self.workspace, 'env')
         self.venv_pip = 'bin/pip'
         self.repo = repository or '.'
@@ -39,13 +43,13 @@ class LambdaPackage(object):
         self.lambda_config = aws_lambda_config
 
     def create_deployment_package(self):
-        self.add_env_libs_and_src()
-        self.add_shared_lib(self.requirements)
-        self.add_recompiled_libs(self.requirements)
-        self.create_zip_package()
-        return self.zipfile
+        self._add_env_libs_and_src()
+        self._add_shared_lib(self.requirements)
+        self._add_recompiled_libs(self.requirements)
+        self._create_zip_package()
+        return self.zip_file
 
-    def add_env_libs_and_src(self):
+    def _add_env_libs_and_src(self):
         Repo(path=self.repo).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         for package in self.ignored_packages:
@@ -56,7 +60,7 @@ class LambdaPackage(object):
         package_path = get_python_lib()
         self.__add_package_from_path(package_path)
 
-    def add_shared_lib(self, requirements):
+    def _add_shared_lib(self, requirements):
         if requirements:
             so_dir = os.path.join(self.workspace, 'lib')
             os.mkdir(so_dir)
@@ -79,7 +83,7 @@ class LambdaPackage(object):
                     )
                 )
 
-    def add_recompiled_libs(self, requirements):
+    def _add_recompiled_libs(self, requirements):
         if requirements:
             subprocess.call(['virtualenv {}'.format(self.pkg_venv)], shell=True)
             subprocess.call(['find . -name "*.pyc" -exec rm -rf {} \\;'],
@@ -115,8 +119,8 @@ class LambdaPackage(object):
                     pass
                 shutil.copy(src, dst)
 
-    def create_zip_package(self):
-        zip_file = zipfile.ZipFile(self.zipfile, "w", zipfile.ZIP_DEFLATED)
+    def _create_zip_package(self):
+        zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
         abs_src = os.path.abspath(self.workspace)
         for root, _, files in os.walk(self.workspace):
             for filename in files:
@@ -144,6 +148,10 @@ class LambdaDeployer(object):
                  'role_name':'lambda_basic_execution', # IAM role for lambda
                  'handler': 'lambda_module.function_1',  # handler, must receive event  and context as argument
                  'shedule_expression': "rate(5 minutes)", # set for periodic lambda call
+                 'event_sources':{
+                    'api_gateway':{},
+                    's3':{'bucket': 'test'}
+                 },
                  'memory_size': 128,
                  'timeout': 60,
 
@@ -153,6 +161,10 @@ class LambdaDeployer(object):
              },
              'ignored_packages': ('tests', 'testlib', 'debug')
         ]
+        :param region_name: AWS region
+        :param aws_access_key_id:  AWS credentials
+        :param aws_secret_access_key: AWS credentials
+        :param version: AWS Lambda function version alias
         """
         self.zipfile = LambdaPackage(
             aws_lambda_config, repository
@@ -166,11 +178,11 @@ class LambdaDeployer(object):
         self.arns = {}
 
     def deploy(self):
-        self.upload()
-        self.set_shedule()
+        self._upload()
+        self._set_shedule()
         # TODO: add SNS and S3 source
 
-    def upload(self):
+    def _upload(self):
         for function_name, function_config in self.lambda_config.items():
             try:
                 response = self.client.update_lambda_function_code(
@@ -190,7 +202,7 @@ class LambdaDeployer(object):
                 )
             self.arns[function_name] = response['FunctionArn']
 
-    def set_shedule(self):
+    def _set_shedule(self):
         settings = self.client.settings
         client = boto3.client('events', **settings)
         for function_name, function_config in self.lambda_config.items():
@@ -219,6 +231,17 @@ class LambdaDeployer(object):
                 )
 
                 try:
-                    self.client.add_permission(**permission)
+                    self.client.instance.add_permission(**permission)
                 except ClientError:
                     pass
+
+    def _add_permissions(self):
+        for function_name, function_config in self.lambda_config.items():
+            event_sources = function_config.get('event_sources', None)
+            if event_sources and 's3' in event_sources:
+                self.client.add_s3_invoke_permission(
+                    function_name,
+                    event_sources['s3']['bucket_name']
+                )
+            elif event_sources and 'api_gateway' in event_sources:
+                self.client.add_api_gateway_invoke_permission(function_name)

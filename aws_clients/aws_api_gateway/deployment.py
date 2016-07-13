@@ -9,27 +9,9 @@ from aws_clients.aws_lambda.client import LambdaClient
 logger = logging.getLogger('AWSApiGateway')
 
 
-class Swagger():
-    @classmethod
-    def create_swagger_config(cls,
-                              swagger_template_file,
-                              domain_name,
-                              base_path,
-
-                              ):
-        with open(swagger_template_file) as tmp:
-            swagger_json = json.load(tmp)
-        swagger_json['host'] = domain_name
-        swagger_json['basePath'] = '/{}'.format(base_path)
-
-        return swagger_json
-
-
 class ApiGatewayDeployer(object):
     def __init__(self,
-                 swagger_template_file,
-                 domain_name,
-                 base_path,
+                 swagger_file,
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key,
@@ -46,14 +28,12 @@ class ApiGatewayDeployer(object):
         self.certificate_body = certificate_body
         self.certificate_private_key = certificate_private_key
         self.certificate_chain = certificate_chain
-        self.swagger_json = Swagger.create_swagger_config(
-            swagger_template_file,
-            domain_name,
-            base_path
-        )
+        with open(swagger_file) as tmp:
+            self.swagger_json = json.load(tmp)
+
         self.api_name = self.swagger_json['info']['title']
-        self.domain_name = domain_name
-        self.base_path = base_path
+        self.domain_name = self.swagger_json['host']
+        self.base_path = self.swagger_json['basePath'].lstrip('/')
 
     def __create_api(self):
         self.client.create_api(self.swagger_json)
@@ -67,15 +47,13 @@ class ApiGatewayDeployer(object):
         self.client.deploy_stage(self.api_name, stage, lambda_function_name)
 
     def __add_lambda_permission(self, lambda_function_name):
-        permission = dict(
-            FunctionName=lambda_function_name,
-            StatementId="58f7cfba-2278-4583-baae-227c582c2023",
-            Action="lambda:InvokeFunction",
-            Principal="apigateway.amazonaws.com",
-        )
         try:
             lambda_client = LambdaClient(**self.client.settings)
-            lambda_client.instance.add_permission(**permission)
+            lambda_client.add_invoke_permission(
+                function_name=lambda_function_name,
+                statement_id="58f7cfba-2278-4583-baae-227c582c2023",
+                principal="apigateway.amazonaws.com"
+            )
         except ClientError as exc:
             logger.exception(exc)
 
@@ -102,6 +80,13 @@ class ApiGatewayDeployer(object):
         )
 
     def deploy(self, stage, lambda_function_name, lambda_version=None):
+        """
+        Create API by swagger file and deploy stage with variable `lambda_function`
+        :param stage:
+        :param lambda_function_name:
+        :param lambda_version:
+        :return:
+        """
         self.__create_api()
         self.__add_lambda_permission(lambda_function_name)
         self.__deploy_stage(stage, lambda_function_name, lambda_version)
@@ -110,4 +95,4 @@ class ApiGatewayDeployer(object):
             self.certificate_private_key,
             self.certificate_chain
         )
-        self.__create_path_mapping()
+        self.__create_path_mapping(stage)

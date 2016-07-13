@@ -1,5 +1,7 @@
 import json
 
+import boto3
+
 from aws_clients.aws_sqs.client import SQSClient
 
 

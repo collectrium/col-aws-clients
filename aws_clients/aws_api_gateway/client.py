@@ -19,7 +19,7 @@ class ApiGatewayClient(BaseAWSClient):
             aws_secret_access_key=aws_secret_access_key,
         )
 
-    def get_api_id(self, api_name):
+    def __get_api_id(self, api_name):
         api_list = self.instance.get_rest_apis().get('items')
         for item in api_list:
             if item['name'] == api_name:
@@ -27,7 +27,7 @@ class ApiGatewayClient(BaseAWSClient):
 
     def create_api(self, swagger_json):
         api_name = swagger_json['info']['title']
-        api_id = self.get_api_id(api_name)
+        api_id = self.__get_api_id(api_name)
         if not api_id:
             self.instance.import_rest_api(
                 body=swagger_json
@@ -40,7 +40,7 @@ class ApiGatewayClient(BaseAWSClient):
             )
 
     def deploy_stage(self, api_name, stage, lambda_function_name):
-        api_id = self.get_api_id(api_name)
+        api_id = self.__get_api_id(api_name)
         self.instance.create_deployment(
             restApiId=api_id,
             stageName=stage,
@@ -74,12 +74,12 @@ class ApiGatewayClient(BaseAWSClient):
                 domainName=domain_name,
                 basePath=base_path
             )
-        except ClientError as cle:
-            print cle
+        except ClientError:
+            pass
 
         self.instance.create_base_path_mapping(
             domainName=domain_name,
             basePath=base_path,
-            restApiId=self.get_api_id(api_name),
+            restApiId=self.__get_api_id(api_name),
             stage=stage
         )

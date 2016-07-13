@@ -14,6 +14,12 @@ class LambdaClient(BaseAWSClient):
             aws_access_key_id,
             aws_secret_access_key
     ):
+        """
+
+        :param region_name: AWS region
+        :param aws_access_key_id:  AWS credentials
+        :param aws_secret_access_key: AWS credentials
+        """
 
         super(LambdaClient, self).__init__(
             service='lambda',
@@ -37,7 +43,7 @@ class LambdaClient(BaseAWSClient):
         Create AWS Lambda function
         :param role_name: AWS Lambda function execution role
         :param handler:  handler function
-        :param zip_file: source code package
+        :param zip_file: source code package filepath
         :param timeout: AWS Lambda execution timeout
         :param memory_size:  power of AWS Lambda instance
         :return:
@@ -134,6 +140,13 @@ class LambdaClient(BaseAWSClient):
         )
 
     def publish_version_alias(self, function_name, version_name, code_sha256):
+        """
+        Publish AWS Lambda function with alias
+        :param function_name:
+        :param version_name:
+        :param code_sha256:
+        :return:
+        """
         response = self.instance.publish_version(
             FunctionName=function_name,
             CodeSha256=code_sha256
@@ -143,3 +156,23 @@ class LambdaClient(BaseAWSClient):
             Name=version_name,
             FunctionVersion=response['Version'],
         )
+
+    def add_api_gateway_invoke_permission(self, function_name, ):
+
+        permission = dict(
+            FunctionName=function_name,
+            StatementId="58f7cfba-2278-4583-baae-227c582c2023",
+            Action="lambda:InvokeFunction",
+            Principal="apigateway.amazonaws.com",
+        )
+        self.instance.add_permission(**permission)
+
+    def add_s3_invoke_permission(self, function_name, bucket_name):
+        permission = dict(
+            FunctionName=function_name,
+            StatementId='275fcfb4-9220-4f69-a069-915e258d11a0',
+            Action="lambda:InvokeFunction",
+            Principal="s3.amazonaws.com",
+            SourceArn="arn:aws:s3:::{}".format(bucket_name),
+        )
+        self.instance.add_permission(**permission)
