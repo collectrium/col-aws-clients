@@ -126,7 +126,7 @@ class LambdaPackage(object):
         zip_file.close()
 
 
-class Deployer(object):
+class LambdaDeployer(object):
     def __init__(
             self,
             aws_lambda_config,
@@ -154,7 +154,10 @@ class Deployer(object):
              'ignored_packages': ('tests', 'testlib', 'debug')
         ]
         """
-        self.zipfile = LambdaPackage(aws_lambda_config, repository)
+        self.zipfile = LambdaPackage(
+            aws_lambda_config, repository
+        ).create_deployment_package()
+
         self.client = LambdaClient(region_name,
                                    aws_access_key_id,
                                    aws_secret_access_key)

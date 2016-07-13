@@ -8,24 +8,7 @@ import rsa
 from botocore.exceptions import ClientError
 from botocore.signers import CloudFrontSigner
 
-from aws_clients.aws_client import BaseAWSClient
-
-
-class S3Client(BaseAWSClient):
-    """
-     AWS S3 Service client
-    """
-
-    def __init__(self,
-                 region_name,
-                 aws_access_key_id,
-                 aws_secret_access_key):
-        super(S3Client, self).__init__(
-            service='s3',
-            region_name=region_name,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-        )
+from aws_clients.aws_s3.client import S3Client
 
 
 class S3Bucket(object):
@@ -255,7 +238,7 @@ class S3Bucket(object):
         )
         return response['Body'], response['ContentLength']
 
-    def _remove(self, key):
+    def remove(self, key):
         """
         Remove object from bucket
         :param key:  path to object on bucket
@@ -303,4 +286,3 @@ class S3Bucket(object):
             Bucket=self.bucket_name,
             Key=key
         )
-
