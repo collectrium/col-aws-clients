@@ -1,21 +1,20 @@
 import zipfile
-
+import sys, getopt
 from aws_clients.aws_api_gateway.deployment import ApiGatewayDeployer
 from aws_clients.aws_lambda.deployment import LambdaDeployer
 
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
 
 
-def debug_deploy():
+
+def debug_deploy(aws_access_key_id,aws_secret_access_key):
     zip_file = zipfile.ZipFile('lambda.zip', "w", zipfile.ZIP_DEFLATED)
     zip_file.write('examples/lambda_module.py', 'lambda_module.py')
     zip_file.close()
 
     lambda_deployer = LambdaDeployer(
         region_name='us-east-1',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
         zip_file='lambda.zip',
         version='development',
         aws_lambda_config={
@@ -31,13 +30,14 @@ def debug_deploy():
     lambda_deployer.deploy()
 
     ag_deployer = ApiGatewayDeployer(
+        api_name = 'Sample',
         region_name='us-east-1',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
         swagger_file='examples/sample_config.json'
     )
 
-    ag_deployer.deploy(
+    ag_deployer.deploy_stage(
         'test',
         'roma_api_function',
         'development'
@@ -45,4 +45,10 @@ def debug_deploy():
 
 
 if __name__ == '__main__':
-    debug_deploy()
+    _, args = getopt.getopt(sys.argv[1:],'h')
+    try:
+        aws_access_key_id  = args[0].split('=')[1]
+        aws_secret_access_key = args[1].split('=')[1]
+        debug_deploy(aws_access_key_id, aws_secret_access_key)
+    except Exception as exc:
+        print  'Invalid usage {}'.format(exc.message)

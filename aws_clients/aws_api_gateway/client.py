@@ -31,7 +31,7 @@ class ApiGatewayClient(BaseAWSClient):
         api_name = swagger_json['info']['title']
         api_id = self.__get_api_id(api_name)
         if not api_id:
-            print self.instance.import_rest_api(
+            self.instance.import_rest_api(
                 body=json.dumps(swagger_json)
             )
         else:
@@ -42,7 +42,7 @@ class ApiGatewayClient(BaseAWSClient):
                     ".".join(swagger_json['host'].split('.')[1:])
                 )
 
-            print self.instance.put_rest_api(
+            self.instance.put_rest_api(
                 restApiId=api_id,
                 mode='overwrite',
                 body=json.dumps(swagger_json)
