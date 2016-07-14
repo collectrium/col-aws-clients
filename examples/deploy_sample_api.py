@@ -1,12 +1,12 @@
+import getopt
+import sys
 import zipfile
-import sys, getopt
+
 from aws_clients.aws_api_gateway.deployment import ApiGatewayDeployer
 from aws_clients.aws_lambda.deployment import LambdaDeployer
 
 
-
-
-def debug_deploy(aws_access_key_id,aws_secret_access_key):
+def debug_deploy(aws_access_key_id, aws_secret_access_key):
     zip_file = zipfile.ZipFile('lambda.zip', "w", zipfile.ZIP_DEFLATED)
     zip_file.write('examples/lambda_module.py', 'lambda_module.py')
     zip_file.close()
@@ -24,13 +24,14 @@ def debug_deploy(aws_access_key_id,aws_secret_access_key):
                 'event_sources': {
                     'api_gateway': {},
                 },
+                'ignored_packages': ['ipython', 'pudb']
             }
         }
     )
     lambda_deployer.deploy()
 
     ag_deployer = ApiGatewayDeployer(
-        api_name = 'Sample',
+        api_name='Sample',
         region_name='us-east-1',
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
@@ -45,10 +46,10 @@ def debug_deploy(aws_access_key_id,aws_secret_access_key):
 
 
 if __name__ == '__main__':
-    _, args = getopt.getopt(sys.argv[1:],'h')
+    _, args = getopt.getopt(sys.argv[1:], 'h')
     try:
-        aws_access_key_id  = args[0].split('=')[1]
+        aws_access_key_id = args[0].split('=')[1]
         aws_secret_access_key = args[1].split('=')[1]
         debug_deploy(aws_access_key_id, aws_secret_access_key)
     except Exception as exc:
-        print  'Invalid usage {}'.format(exc.message)
+        print 'Invalid usage {}'.format(exc.message)
