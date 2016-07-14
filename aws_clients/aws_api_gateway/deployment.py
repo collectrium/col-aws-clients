@@ -8,29 +8,25 @@ logger = logging.getLogger('AWSApiGateway')
 
 class ApiGatewayDeployer(object):
     def __init__(self,
+                 api_name,
                  swagger_file,
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key,
-                 certificate_body=None,
-                 certificate_private_key=None,
-                 certificate_chain=None
+                 domain_name=None,
 
                  ):
-
         self.client = ApiGatewayClient(
             region_name, aws_access_key_id, aws_secret_access_key
         )
-
-        self.certificate_body = certificate_body
-        self.certificate_private_key = certificate_private_key
-        self.certificate_chain = certificate_chain
         with open(swagger_file) as tmp:
             self.swagger_json = json.load(tmp)
 
-        self.api_name = self.swagger_json['info']['title']
-        self.domain_name = self.swagger_json['host']
-        self.base_path = self.swagger_json['basePath'].lstrip('/')
+        self.api_name = api_name
+        self.swagger_json['info']['title'] = api_name
+        if domain_name:
+            self.swagger_json['host'] = domain_name
+        self.domain_name = domain_name
 
     def __create_api(self):
         self.client.create_api(self.swagger_json)
@@ -56,15 +52,15 @@ class ApiGatewayDeployer(object):
             certificate_chain=certificate_chain
         )
 
-    def __create_path_mapping(self, stage):
+    def __create_path_mapping(self, stage, base_path):
         self.client.create_path_mapping(
             self.api_name,
             stage,
             self.domain_name,
-            self.base_path
+            base_path
         )
 
-    def deploy(self, stage, lambda_function_name, lambda_version=None):
+    def deploy_stage(self, stage, lambda_function_name, lambda_version=None):
         """
         Create API by swagger file and deploy stage with variable `lambda_function`
         :param stage:
@@ -74,12 +70,14 @@ class ApiGatewayDeployer(object):
         """
         self.__create_api()
         self.__deploy_stage(stage, lambda_function_name, lambda_version)
-        if all((self.certificate_body,
-                self.certificate_private_key,
-                self.certificate_chain)):
-            self.__create_custom_domain_name(
-                self.certificate_body,
-                self.certificate_private_key,
-                self.certificate_chain
-            )
-            self.__create_path_mapping(stage)
+
+    def deploy_domain(self, stage, base_path,
+                      certificate_body,
+                      certificate_private_key,
+                      certificate_chain):
+        self.__create_custom_domain_name(
+            certificate_body,
+            certificate_private_key,
+            certificate_chain
+        )
+        self.__create_path_mapping(stage, base_path)

@@ -35,6 +35,13 @@ class ApiGatewayClient(BaseAWSClient):
                 body=json.dumps(swagger_json)
             )
         else:
+            if (swagger_json['host'].endswith('amazonaws.com') and
+                    not swagger_json['host'].startswith(api_id)):
+                swagger_json['host'] = '{}.{}'.format(
+                    api_id,
+                    ".".join(swagger_json['host'].split('.')[1:])
+                )
+
             print self.instance.put_rest_api(
                 restApiId=api_id,
                 mode='overwrite',
@@ -52,38 +59,36 @@ class ApiGatewayClient(BaseAWSClient):
             )
         )
 
+    def create_custom_domain_name(
+            self,
+            domain_name,
+            certificate_body,
+            certificate_private_key,
+            certificate_chain
+    ):
+        response = self.instance.get_domain_names()
+        domain_names = [item['domainName'] for item in response.get('items')]
+        if not (domain_names and domain_name in domain_names):
+            self.instance.create_domain_name(
+                domainName=domain_name,
+                certificateName=domain_name,
+                certificateBody=certificate_body,
+                certificatePrivateKey=certificate_private_key,
+                certificateChain=certificate_chain
+            )
 
-def create_custom_domain_name(
-        self,
-        domain_name,
-        certificate_body,
-        certificate_private_key,
-        certificate_chain
-):
-    response = self.instance.get_domain_names()
-    domain_names = [item['domainName'] for item in response.get('items')]
-    if not (domain_names and domain_name in domain_names):
-        self.instance.create_domain_name(
+    def create_path_mapping(self, api_name, stage, domain_name, base_path):
+        try:
+            self.instance.delete_base_path_mapping(
+                domainName=domain_name,
+                basePath=base_path
+            )
+        except ClientError:
+            pass
+
+        self.instance.create_base_path_mapping(
             domainName=domain_name,
-            certificateName=domain_name,
-            certificateBody=certificate_body,
-            certificatePrivateKey=certificate_private_key,
-            certificateChain=certificate_chain
+            basePath=base_path,
+            restApiId=self.__get_api_id(api_name),
+            stage=stage
         )
-
-
-def create_path_mapping(self, api_name, stage, domain_name, base_path):
-    try:
-        self.instance.delete_base_path_mapping(
-            domainName=domain_name,
-            basePath=base_path
-        )
-    except ClientError:
-        pass
-
-    self.instance.create_base_path_mapping(
-        domainName=domain_name,
-        basePath=base_path,
-        restApiId=self.__get_api_id(api_name),
-        stage=stage
-    )

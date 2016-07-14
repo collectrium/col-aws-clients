@@ -52,13 +52,13 @@ class LambdaPackage(object):
     def _add_env_libs_and_src(self):
         Repo(path=self.repo).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
+        package_path = get_python_lib()
+        self.__add_package_from_path(package_path)
         for package in self.ignored_packages:
             try:
                 shutil.rmtree(os.path.join(self.workspace, package))
             except OSError:
                 pass
-        package_path = get_python_lib()
-        self.__add_package_from_path(package_path)
 
     def _add_shared_lib(self, requirements):
         if requirements:
