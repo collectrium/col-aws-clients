@@ -87,7 +87,6 @@ class S3Bucket(object):
                      url_expiration_time=604800,  # 60*60*24*7s
                      force_http_url=False,
                      content_type=None,
-                     cloudfront_domain=None
                     ):
         """
         Generate presigned url for object on bucket
@@ -100,11 +99,6 @@ class S3Bucket(object):
         """
         if key is None:
             return
-        if cloudfront_domain:
-            return self._generate_cloudfront_url(
-                key, cloudfront_domain, url_expiration_time, force_http_url
-
-            )
 
         if not content_type:
             key = key.lstrip('/')
@@ -132,9 +126,11 @@ class S3Bucket(object):
             )
         return presigned_url
 
-    def _generate_cloudfront_url(self,
+    def generate_cloudfront_url(self,
                                  key,
                                  cloudfront_domain,
+                                 cloudfront_key_id,
+                                 cloudfront_private_key,
                                  url_expiration_time=604800,  # 60*60*24*7s
                                  force_http_url=False
                                 ):
@@ -149,8 +145,6 @@ class S3Bucket(object):
         if key is None:
             return
 
-        cloudfront_key_id = self.client.settings['aws_access_key_id']
-        cloudfront_private_key = self.client.settings['aws_secret_access_key']
 
         key = key.lstrip('/')
 

@@ -1,9 +1,6 @@
 import json
-import logging
 
 from aws_clients.aws_api_gateway.client import APIGatewayClient
-
-LOGGER = logging.getLogger('AWSApiGateway')
 
 
 class APIGatewayDeployer(object):
@@ -15,7 +12,7 @@ class APIGatewayDeployer(object):
                  aws_secret_access_key,
                  domain_name=None,
 
-                ):
+                 ):
         self.client = APIGatewayClient(
             region_name, aws_access_key_id, aws_secret_access_key
         )

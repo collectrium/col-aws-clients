@@ -1,10 +1,16 @@
 import getopt
+import logging
 import sys
 import zipfile
 
+import aws_clients
 from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from aws_clients.aws_lambda.deployment import LambdaDeployer
+logger = logging.getLogger('AWSClients')
+fh = logging.FileHandler('deploy.log')
+logger.addHandler(fh)
 
+aws_clients.logger =logger
 
 def debug_deploy(aws_access_key_id, aws_secret_access_key):
     zip_file = zipfile.ZipFile('lambda.zip', "w", zipfile.ZIP_DEFLATED)
@@ -52,4 +58,5 @@ if __name__ == '__main__':
         aws_secret_access_key = args[1].split('=')[1]
         debug_deploy(aws_access_key_id, aws_secret_access_key)
     except Exception as exc:
+        import traceback; traceback.print_exc()
         print 'Invalid usage {}'.format(exc.message)

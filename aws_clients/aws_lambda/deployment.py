@@ -1,6 +1,5 @@
 import distutils
 import itertools
-import logging
 import os
 import shutil
 import subprocess
@@ -13,7 +12,6 @@ from git import Repo
 
 from aws_clients.aws_lambda.client import LambdaClient
 
-logger = logging.getLogger("AWSLambda")
 
 LIB_DIRS = (
     "/lib/", "/lib64/",
