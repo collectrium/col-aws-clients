@@ -27,7 +27,7 @@ class SQSClient(BaseAWSClient):
                      delay_seconds=0,
                      dead_letter_queue=None,
                      max_receive_count=None
-                     ):
+                    ):
         """
         :param queue_name: name of SQS queue
         :type str
@@ -66,8 +66,7 @@ class SQSClient(BaseAWSClient):
                     RedrivePolicy=json.dumps(dict(
                         deadLetterTargetArn=dead_letter_queue_arn,
                         maxReceiveCount=max_receive_count
-                    )
-                    )
+                    ))
                 )
             self.instance.create_queue(**kwargs)
 

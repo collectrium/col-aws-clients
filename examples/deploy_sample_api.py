@@ -2,7 +2,7 @@ import getopt
 import sys
 import zipfile
 
-from aws_clients.aws_api_gateway.deployment import ApiGatewayDeployer
+from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from aws_clients.aws_lambda.deployment import LambdaDeployer
 
 
@@ -30,7 +30,7 @@ def debug_deploy(aws_access_key_id, aws_secret_access_key):
     )
     lambda_deployer.deploy()
 
-    ag_deployer = ApiGatewayDeployer(
+    ag_deployer = APIGatewayDeployer(
         api_name='Sample',
         region_name='us-east-1',
         aws_access_key_id=aws_access_key_id,

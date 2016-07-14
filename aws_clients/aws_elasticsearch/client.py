@@ -10,6 +10,12 @@ class ElasticsearchServiceClient(BaseAWSClient):
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key):
+        """
+
+        :param region_name:
+        :param aws_access_key_id:
+        :param aws_secret_access_key:
+        """
         super(ElasticsearchServiceClient, self).__init__(
             service='es',
             region_name=region_name,

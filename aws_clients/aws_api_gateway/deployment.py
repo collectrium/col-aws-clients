@@ -1,12 +1,12 @@
 import json
 import logging
 
-from aws_clients.aws_api_gateway.client import ApiGatewayClient
+from aws_clients.aws_api_gateway.client import APIGatewayClient
 
-logger = logging.getLogger('AWSApiGateway')
+LOGGER = logging.getLogger('AWSApiGateway')
 
 
-class ApiGatewayDeployer(object):
+class APIGatewayDeployer(object):
     def __init__(self,
                  api_name,
                  swagger_file,
@@ -15,8 +15,8 @@ class ApiGatewayDeployer(object):
                  aws_secret_access_key,
                  domain_name=None,
 
-                 ):
-        self.client = ApiGatewayClient(
+                ):
+        self.client = APIGatewayClient(
             region_name, aws_access_key_id, aws_secret_access_key
         )
         with open(swagger_file) as tmp:
@@ -62,7 +62,8 @@ class ApiGatewayDeployer(object):
 
     def deploy_stage(self, stage, lambda_function_name, lambda_version=None):
         """
-        Create API by swagger file and deploy stage with variable `lambda_function`
+        Create API by swagger file and deploy stage with
+        variable `lambda_function`
         :param stage:
         :param lambda_function_name:
         :param lambda_version:
@@ -75,6 +76,15 @@ class ApiGatewayDeployer(object):
                       certificate_body,
                       certificate_private_key,
                       certificate_chain):
+        """
+
+        :param stage:
+        :param base_path:
+        :param certificate_body:
+        :param certificate_private_key:
+        :param certificate_chain:
+        :return:
+        """
         self.__create_custom_domain_name(
             certificate_body,
             certificate_private_key,

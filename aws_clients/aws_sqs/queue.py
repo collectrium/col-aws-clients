@@ -102,8 +102,7 @@ class SQSQueue(object):
             AttributeNames=['ApproximateNumberOfMessages']
         )
         return int(response.get('Attributes', {}).get(
-            'ApproximateNumberOfMessages', '0')
-        )
+            'ApproximateNumberOfMessages', '0'))
 
     def get_queue_not_visible_number(self):
         response = self.client.instance.get_queue_attributes(
@@ -111,5 +110,4 @@ class SQSQueue(object):
             AttributeNames=['ApproximateNumberOfMessagesNotVisible']
         )
         return int(response.get('Attributes', {}).get(
-            'ApproximateNumberOfMessagesNotVisible', '0')
-        )
+            'ApproximateNumberOfMessagesNotVisible', '0'))

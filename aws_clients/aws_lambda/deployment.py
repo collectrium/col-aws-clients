@@ -1,3 +1,4 @@
+import distutils
 import itertools
 import logging
 import os
@@ -5,7 +6,6 @@ import shutil
 import subprocess
 import tempfile
 import zipfile
-from distutils.sysconfig import get_python_lib
 
 import boto3
 from botocore.exceptions import ClientError
@@ -29,10 +29,13 @@ class LambdaPackage(object):
     """
 
     def __init__(self, aws_lambda_config, repository=None):
+        """
+
+        :param aws_lambda_config:
+        :param repository:
+        """
         self.workspace = tempfile.mkdtemp()
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
-        self.pkg_venv = os.path.join(self.workspace, 'env')
-        self.venv_pip = 'bin/pip'
         self.repo = repository or '.'
         self.requirements = (aws_lambda_config.pop('binary_requirements')
                              if 'binary_requirements' in aws_lambda_config
@@ -52,7 +55,7 @@ class LambdaPackage(object):
     def _add_env_libs_and_src(self):
         Repo(path=self.repo).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
-        package_path = get_python_lib()
+        package_path = distutils.sysconfig.get_python_lib()
         self.__add_package_from_path(package_path)
         for package in self.ignored_packages:
             try:
@@ -85,11 +88,14 @@ class LambdaPackage(object):
 
     def _add_recompiled_libs(self, requirements):
         if requirements:
-            subprocess.call(['virtualenv {}'.format(self.pkg_venv)], shell=True)
+            pkg_venv = os.path.join(self.workspace, 'env')
+            venv_pip = 'bin/pip'
+
+            subprocess.call(['virtualenv {}'.format(pkg_venv)], shell=True)
             subprocess.call(['find . -name "*.pyc" -exec rm -rf {} \\;'],
                             shell=True)
             for package in requirements.keys():
-                cmd = [os.path.join(self.pkg_venv, self.venv_pip), ]
+                cmd = [os.path.join(pkg_venv, venv_pip), ]
                 cmd.append(' install --upgrade --force-reinstall ')
                 cmd.extend(('--global-option=build_ext',
                             '--global-option="--rpath=/var/task/lib"'))
@@ -97,7 +103,7 @@ class LambdaPackage(object):
                 subprocess.call([' '.join(cmd)], shell=True)
 
             self.__add_package_from_path(
-                os.path.join(self.pkg_venv, 'lib/python2.7/site-packages')
+                os.path.join(pkg_venv, 'lib/python2.7/site-packages')
             )
 
     def __add_package_from_path(self, package_path):
@@ -146,8 +152,8 @@ class LambdaDeployer(object):
 
         [  'function_1': {  # function name
                  'role_name':'lambda_basic_execution', # IAM role for lambda
-                 'handler': 'lambda_module.function_1',  # handler, must receive event  and context as argument
-                 'shedule_expression': "rate(5 minutes)", # set for periodic lambda call
+                 'handler': 'lambda_module.function_1',  # handler
+                 'shedule_expression': "rate(5 minutes)", # set for periodic
                  'event_sources':{
                     'api_gateway':{},
                     's3':{'bucket': 'test'}
@@ -176,10 +182,13 @@ class LambdaDeployer(object):
         self.arns = {}
 
     def deploy(self):
+        """
+
+        :return:
+        """
         self._upload()
         self._set_shedule()
         self._add_permissions()
-        # TODO: add SNS and S3 source
 
     def _upload(self):
         for function_name, function_config in self.lambda_config.items():
@@ -189,7 +198,7 @@ class LambdaDeployer(object):
                     self.zipfile,
                     self.version
                 )
-            except ClientError as cle:
+            except ClientError:
                 function_arn = self.client.create_lambda_function(
                     function_name,
                     role_name=function_config['role_name'],

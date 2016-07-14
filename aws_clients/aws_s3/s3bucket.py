@@ -88,7 +88,7 @@ class S3Bucket(object):
                      force_http_url=False,
                      content_type=None,
                      cloudfront_domain=None
-                     ):
+                    ):
         """
         Generate presigned url for object on bucket
         :param key:  path to object on bucket
@@ -137,7 +137,7 @@ class S3Bucket(object):
                                  cloudfront_domain,
                                  url_expiration_time=604800,  # 60*60*24*7s
                                  force_http_url=False
-                                 ):
+                                ):
         """
         Generate presigned url for object on bucket
         :param key:  path to object on bucket
@@ -256,11 +256,11 @@ class S3Bucket(object):
         """
         if (url is None) or (urlparse.urlparse(url).path == url):
             return url
-        up = urlparse.urlparse(url)
-        if not up.scheme:
+        upr = urlparse.urlparse(url)
+        if not upr.scheme:
             path = url
         else:
-            path = urllib.unquote(up.path.encode('utf-8'))
+            path = urllib.unquote(upr.path.encode('utf-8'))
         return path
 
     def make_public(self, key):

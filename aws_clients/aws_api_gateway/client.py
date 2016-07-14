@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from aws_clients.aws_client import BaseAWSClient
 
 
-class ApiGatewayClient(BaseAWSClient):
+class APIGatewayClient(BaseAWSClient):
     """
      AWS Api Gateway Service client
     """
@@ -14,7 +14,12 @@ class ApiGatewayClient(BaseAWSClient):
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key):
-        super(ApiGatewayClient, self).__init__(
+        """
+        :param region_name: AWS region
+        :param aws_access_key_id: AWS credentials
+        :param aws_secret_access_key: AWS credentials
+        """
+        super(APIGatewayClient, self).__init__(
             service='apigateway',
             region_name=region_name,
             aws_access_key_id=aws_access_key_id,
@@ -28,6 +33,11 @@ class ApiGatewayClient(BaseAWSClient):
                 return item['id']
 
     def create_api(self, swagger_json):
+        """
+        Create API
+        :param swagger_json:  AWS API Gateway Swagger config
+        :return:
+        """
         api_name = swagger_json['info']['title']
         api_id = self.__get_api_id(api_name)
         if not api_id:
@@ -48,14 +58,22 @@ class ApiGatewayClient(BaseAWSClient):
                 body=json.dumps(swagger_json)
             )
 
-    def deploy_stage(self, api_name, stage, lambda_function_name):
+    def deploy_stage(self, api_name, stage, lambda_function_name, version=None):
+        """
+        Deploy stage
+        :param api_name: API Gateway visible name
+        :param stage: stage name
+        :param lambda_function_name: function name for stage
+        :return:
+        """
         api_id = self.__get_api_id(api_name)
         self.instance.create_deployment(
             restApiId=api_id,
             stageName=stage,
             stageDescription='',
             variables=dict(
-                lambda_function=lambda_function_name
+                lambda_function=lambda_function_name if not version else
+                '{}:{}'.format(lambda_function_name, version)
             )
         )
 
@@ -66,6 +84,14 @@ class ApiGatewayClient(BaseAWSClient):
             certificate_private_key,
             certificate_chain
     ):
+        """
+
+        :param domain_name:
+        :param certificate_body:
+        :param certificate_private_key:
+        :param certificate_chain:
+        :return:
+        """
         response = self.instance.get_domain_names()
         domain_names = [item['domainName'] for item in response.get('items')]
         if not (domain_names and domain_name in domain_names):
@@ -78,6 +104,14 @@ class ApiGatewayClient(BaseAWSClient):
             )
 
     def create_path_mapping(self, api_name, stage, domain_name, base_path):
+        """
+        Create path mapping
+        :param api_name:  API Gateway visible name
+        :param stage:  stage
+        :param domain_name:  custom domain name
+        :param base_path: base pathn for mapping
+        :return:
+        """
         try:
             self.instance.delete_base_path_mapping(
                 domainName=domain_name,

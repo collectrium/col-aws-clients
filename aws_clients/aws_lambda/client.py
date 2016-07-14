@@ -169,7 +169,10 @@ class LambdaClient(BaseAWSClient):
         )
 
     def add_api_gateway_invoke_permission(self, function_name, ):
-
+        """
+        :param function_name:
+        :return:
+        """
         permission = dict(
             FunctionName=function_name+':development',
             StatementId="58f7cfba-2278-4583-baae-227c582c2023",
