@@ -1,8 +1,12 @@
+import logging
+
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
 
 from aws_clients.aws_client import BaseAWSClient
+
+LOGGER = logging.getLogger(__name__)
 
 
 class LambdaClient(BaseAWSClient):
@@ -51,9 +55,11 @@ class LambdaClient(BaseAWSClient):
         :return:
         """
 
+        LOGGER.info('Create lambda_function `%s`', function_name)
         iam = boto3.resource('iam', **self.settings)
         role = iam.Role(role_name)
 
+        LOGGER.info('Role arn `%s`', role.arn)
         response = self.instance.create_function(
             FunctionName=function_name,
             Runtime='python2.7',
@@ -66,6 +72,7 @@ class LambdaClient(BaseAWSClient):
             MemorySize=memory_size or 128,
         )
         if version:
+            LOGGER.info('Publish version with alias `%s`', version)
             self.publish_version_alias(
                 function_name,
                 version,
@@ -80,11 +87,13 @@ class LambdaClient(BaseAWSClient):
         :param zip_file: source code package
         :return:
         """
+        LOGGER.info('Update function code `%s`', function_name)
         response = self.instance.update_function_code(
             FunctionName=function_name,
             ZipFile=open(zip_file).read(),
         )
         if version:
+            LOGGER.info('Publish version with alias `%s`', version)
             self.publish_version_alias(
                 function_name,
                 version,
@@ -108,6 +117,7 @@ class LambdaClient(BaseAWSClient):
         :param timeout: AWS Lambda execution timeout
         :param memory_size:  power of AWS Lambda instance
         """
+        LOGGER.info('Update function configuration `%s`', function_name)
         kwargs = dict(
             FunctionName=function_name
         )
@@ -139,6 +149,7 @@ class LambdaClient(BaseAWSClient):
         Delete AWS Lamda function
         :return:
         """
+        LOGGER.info('Delete function  `%s`', function_name)
         self.instance.delete_function(
             FunctionName=function_name
         )
@@ -173,8 +184,9 @@ class LambdaClient(BaseAWSClient):
         :param function_name:
         :return:
         """
+        LOGGER.info('Add API Gateway permission `%s`', function_name)
         permission = dict(
-            FunctionName=function_name+':development',
+            FunctionName=function_name + ':development',
             StatementId="58f7cfba-2278-4583-baae-227c582c2023",
             Action="lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",
@@ -182,6 +194,7 @@ class LambdaClient(BaseAWSClient):
         self.instance.add_permission(**permission)
 
     def add_s3_invoke_permission(self, function_name, bucket_name):
+        LOGGER.info('Add S3 permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,
             StatementId='275fcfb4-9220-4f69-a069-915e258d11a0',

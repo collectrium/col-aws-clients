@@ -1,5 +1,6 @@
 import distutils
 import itertools
+import logging
 import os
 import shutil
 import subprocess
@@ -21,6 +22,8 @@ LIB_DIRS = (
 )
 
 
+LOGGER = logging.getLogger(__name__)
+
 class LambdaPackage(object):
     """
     Helper for creation code package
@@ -33,8 +36,10 @@ class LambdaPackage(object):
         :param repository:
         """
         self.workspace = tempfile.mkdtemp()
+        LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
         self.repo = repository or '.'
+        LOGGER.info('Repository `{}`'.format())
         self.requirements = (aws_lambda_config.pop('binary_requirements')
                              if 'binary_requirements' in aws_lambda_config
                              else None)

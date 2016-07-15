@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from aws_clients.aws_client import BaseAWSClientException
 from .client import LambdaClient
 
-logger = logging.getLogger("AWSLambda")
+LOGGER = logging.getLogger(__name__)
 
 
 class LambdaFunctionNotFound(BaseAWSClientException):
@@ -52,7 +52,7 @@ class LambdaFunction(object):
                 'FunctionArn'
             )
         except ClientError as exc:
-            logger.exception("[AWS Lambda] {}".format(exc.message))
+            LOGGER.exception(" {}".format(exc.message))
             raise LambdaFunctionNotFound
 
     def __call__(self, payload, async=True):
@@ -73,9 +73,9 @@ class LambdaFunction(object):
             kwargs.update(Qualifier=self.version)
 
         response = self.client.instance.invoke(**kwargs)
-        logger.info("[AWS Lambda]Lambda)invoking time %s",
+        LOGGER.info("Lambda)invoking time %s",
                     str(time.time() - start_time))
         if not async and 'Payload' in response:
             result = response['Payload'].read()
-            logger.info('[AWS Lambda]Receive result %s', str((result)))
+            LOGGER.info('Receive result %s', str((result)))
             return result

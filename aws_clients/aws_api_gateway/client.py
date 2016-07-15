@@ -1,9 +1,11 @@
 import json
+import logging
 
 from botocore.exceptions import ClientError
 
 from aws_clients.aws_client import BaseAWSClient
 
+LOGGER = logging.getLogger(__name__)
 
 class APIGatewayClient(BaseAWSClient):
     """
@@ -30,7 +32,11 @@ class APIGatewayClient(BaseAWSClient):
         api_list = self.instance.get_rest_apis().get('items')
         for item in api_list:
             if item['name'] == api_name:
+                LOGGER.info('Found API `{}` with id `{}`'.format(
+                    api_name, item['id']
+                ))
                 return item['id']
+        LOGGER.info('API `{}` not found'.format(api_name))
 
     def create_api(self, swagger_json):
         """
@@ -41,9 +47,11 @@ class APIGatewayClient(BaseAWSClient):
         api_name = swagger_json['info']['title']
         api_id = self.__get_api_id(api_name)
         if not api_id:
-            self.instance.import_rest_api(
+            LOGGER.info('Create API')
+            response = self.instance.import_rest_api(
                 body=json.dumps(swagger_json)
             )
+            LOGGER.info('API created with id `{}`'.format(response['id']))
         else:
             if (swagger_json['host'].endswith('amazonaws.com') and
                     not swagger_json['host'].startswith(api_id)):
@@ -51,7 +59,7 @@ class APIGatewayClient(BaseAWSClient):
                     api_id,
                     ".".join(swagger_json['host'].split('.')[1:])
                 )
-
+            LOGGER.info('Overwrite API with id `{}`')
             self.instance.put_rest_api(
                 restApiId=api_id,
                 mode='overwrite',

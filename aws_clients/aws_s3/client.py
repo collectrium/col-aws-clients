@@ -1,4 +1,8 @@
+import logging
+
 from aws_clients.aws_client import BaseAWSClient
+
+LOGGER = logging.getLogger(__name__)
 
 
 class S3Client(BaseAWSClient):

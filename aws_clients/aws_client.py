@@ -1,5 +1,8 @@
+import logging
+
 import boto3
 
+LOGGER = logging.getLogger(__name__)
 
 class BaseAWSClientException(Exception):
     """
@@ -32,6 +35,7 @@ class BaseAWSClient(object):
             "aws_access_key_id": aws_access_key_id,
             "aws_secret_access_key": aws_secret_access_key
         }
+        LOGGER.info('Initialize AWS client for service `%s`', service)
 
         self.settings = settings
         settings.update(kwargs)

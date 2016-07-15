@@ -6,11 +6,10 @@ import zipfile
 import aws_clients
 from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from aws_clients.aws_lambda.deployment import LambdaDeployer
-logger = logging.getLogger('AWSClients')
-fh = logging.FileHandler('deploy.log')
-logger.addHandler(fh)
-
-aws_clients.logger =logger
+# logger = logging.getLogger('AWSClients')
+# fh = logging.FileHandler('deploy.log')
+# logger.addHandler(fh)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def debug_deploy(aws_access_key_id, aws_secret_access_key):
     zip_file = zipfile.ZipFile('lambda.zip', "w", zipfile.ZIP_DEFLATED)
@@ -41,7 +40,7 @@ def debug_deploy(aws_access_key_id, aws_secret_access_key):
         region_name='us-east-1',
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
-        swagger_file='examples/sample_config.json'
+        swagger_file=open('examples/sample_config.json')
     )
 
     ag_deployer.deploy_stage(
