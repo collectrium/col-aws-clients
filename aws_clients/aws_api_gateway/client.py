@@ -7,6 +7,7 @@ from aws_clients.aws_client import BaseAWSClient
 
 LOGGER = logging.getLogger(__name__)
 
+
 class APIGatewayClient(BaseAWSClient):
     """
      AWS Api Gateway Service client

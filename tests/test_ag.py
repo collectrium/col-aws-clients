@@ -1,19 +1,13 @@
 from __future__ import unicode_literals
 
-import botocore
+import json
+from cStringIO import StringIO
+
 from mock import patch
 
 from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from tests.base_test import BaseTest
-
-orig = botocore.client.BaseClient._make_api_call
-
-
-def mock_make_api_call(self, operation_name, kwarg):
-    if operation_name == 'DescribeTags':
-        # Your Operation here!
-        print(kwarg)
-    return orig(self, operation_name, kwarg)
+from tests.mock_aws_api import mock_make_api_call
 
 
 class AGTest(BaseTest):
@@ -62,14 +56,24 @@ class AGTest(BaseTest):
             }
         }
     }
+    swagger_file = StringIO(json.dumps(swagger_json))
+
 
     @patch('botocore.client.BaseClient._make_api_call', new=mock_make_api_call)
     def test_deployment(self):
-        ag_deployer =       APIGatewayDeployer(
+        ag_deployer = APIGatewayDeployer(
             api_name='Sample',
             region_name=self.region_name,
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key,
-            swagger_file='examples/sample_config.json'
+            swagger_file=StringIO(json.dumps(self.swagger_json)),
+            domain_name="example.com"
+
         )
-        ag_deployer.deploy_stage(lambda_function_name='api_lambda', lambda_version='development')
+
+        ag_deployer.deploy_stage(stage='development',
+                                     lambda_function_name='api_lambda',
+                                     lambda_version='development')
+
+        ag_deployer.deploy_domain(stage='development', base_path='v1',
+                                  certificate_body="", certificate_private_key="", certificate_chain='')
