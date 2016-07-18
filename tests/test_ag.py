@@ -62,7 +62,7 @@ class AGTest(BaseTest):
     @patch('botocore.client.BaseClient._make_api_call', new=mock_make_api_call)
     def test_deployment(self):
         ag_deployer = APIGatewayDeployer(
-            api_name='Sample',
+            api_name='Sample', 
             region_name=self.region_name,
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key,
