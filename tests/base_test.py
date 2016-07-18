@@ -6,6 +6,7 @@ class BaseTest(unittest.TestCase):
     """
     Very base class, only to add self.assertEqualsS3Urls method
     """
+    account_id = '1234567890'
     region_name = 'us-east-1'
     aws_access_key_id = 'AKIAIOSFODNN7EXAMPLE'
     aws_secret_access_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'

@@ -10,9 +10,6 @@ from .client import LambdaClient
 LOGGER = logging.getLogger(__name__)
 
 
-class LambdaFunctionNotFound(BaseAWSClientException):
-    pass
-
 
 class LambdaFunction(object):
     """
@@ -42,18 +39,8 @@ class LambdaFunction(object):
             aws_secret_access_key=aws_secret_access_key,
         )
         self.function_name = function_name
-        self.function_arn = None
         self.version = version
-        try:
-            response = self.client.instance.get_function(
-                FunctionName=function_name,
-            )
-            self.function_arn = response.get('Configuration', {}).get(
-                'FunctionArn'
-            )
-        except ClientError as exc:
-            LOGGER.exception(" {}".format(exc.message))
-            raise LambdaFunctionNotFound
+
 
     def __call__(self, payload, async=True):
         """
