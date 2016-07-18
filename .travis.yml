@@ -27,7 +27,5 @@ install:
 
 script:
   - python -m runtest
-  - pylint --rcfile=.pylintrc data_bucket maintenance
+  - pylint --rcfile=.pylintrc aws_clients
 
-notifications:
-  slack: collectrium:flckGVOJPRClghuu4hyiEANe

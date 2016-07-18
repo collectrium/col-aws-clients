@@ -8,24 +8,7 @@ import rsa
 from botocore.exceptions import ClientError
 from botocore.signers import CloudFrontSigner
 
-from aws_clients.aws_client import BaseAWSClient
-
-
-class S3Client(BaseAWSClient):
-    """
-     AWS S3 Service client
-    """
-
-    def __init__(self,
-                 region_name,
-                 aws_access_key_id,
-                 aws_secret_access_key):
-        super(S3Client, self).__init__(
-            service='s3',
-            region_name=region_name,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-        )
+from aws_clients.aws_s3.client import S3Client
 
 
 class S3Bucket(object):
@@ -104,8 +87,7 @@ class S3Bucket(object):
                      url_expiration_time=604800,  # 60*60*24*7s
                      force_http_url=False,
                      content_type=None,
-                     cloudfront_domain=None
-                     ):
+                    ):
         """
         Generate presigned url for object on bucket
         :param key:  path to object on bucket
@@ -117,11 +99,6 @@ class S3Bucket(object):
         """
         if key is None:
             return
-        if cloudfront_domain:
-            return self._generate_cloudfront_url(
-                key, cloudfront_domain, url_expiration_time, force_http_url
-
-            )
 
         if not content_type:
             key = key.lstrip('/')
@@ -149,12 +126,14 @@ class S3Bucket(object):
             )
         return presigned_url
 
-    def _generate_cloudfront_url(self,
+    def generate_cloudfront_url(self,
                                  key,
                                  cloudfront_domain,
+                                 cloudfront_key_id,
+                                 cloudfront_private_key,
                                  url_expiration_time=604800,  # 60*60*24*7s
                                  force_http_url=False
-                                 ):
+                                ):
         """
         Generate presigned url for object on bucket
         :param key:  path to object on bucket
@@ -166,8 +145,6 @@ class S3Bucket(object):
         if key is None:
             return
 
-        cloudfront_key_id = self.client.settings['aws_access_key_id']
-        cloudfront_private_key = self.client.settings['aws_secret_access_key']
 
         key = key.lstrip('/')
 
@@ -255,7 +232,7 @@ class S3Bucket(object):
         )
         return response['Body'], response['ContentLength']
 
-    def _remove(self, key):
+    def remove(self, key):
         """
         Remove object from bucket
         :param key:  path to object on bucket
@@ -273,11 +250,11 @@ class S3Bucket(object):
         """
         if (url is None) or (urlparse.urlparse(url).path == url):
             return url
-        up = urlparse.urlparse(url)
-        if not up.scheme:
+        upr = urlparse.urlparse(url)
+        if not upr.scheme:
             path = url
         else:
-            path = urllib.unquote(up.path.encode('utf-8'))
+            path = urllib.unquote(upr.path.encode('utf-8'))
         return path
 
     def make_public(self, key):
@@ -303,4 +280,3 @@ class S3Bucket(object):
             Bucket=self.bucket_name,
             Key=key
         )
-
