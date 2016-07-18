@@ -7,7 +7,7 @@ from mock import patch
 
 from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from tests.base_test import BaseTest
-from tests.mock_aws_api import mock_make_api_call
+from tests.mock_aws_api import AWSMock
 
 
 class AGTest(BaseTest):
@@ -59,7 +59,7 @@ class AGTest(BaseTest):
     swagger_file = StringIO(json.dumps(swagger_json))
 
 
-    @patch('botocore.client.BaseClient._make_api_call', new=mock_make_api_call)
+    @patch('botocore.client.BaseClient._make_api_call', new=AWSMock.mock_make_api_call)
     def test_deployment(self):
         ag_deployer = APIGatewayDeployer(
             api_name='Sample', 

@@ -39,13 +39,14 @@ class LambdaPackage(object):
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
         self.repo = repository or '.'
-        LOGGER.info('Repository `{}`'.format())
+        LOGGER.info('Repository `{}`'.format(self.repo))
         self.requirements = (aws_lambda_config.pop('binary_requirements')
                              if 'binary_requirements' in aws_lambda_config
                              else None)
         self.ignored_packages = (aws_lambda_config.pop('ignored_packages')
                                  if 'ignored_packages' in aws_lambda_config
                                  else [])
+        LOGGER.info('Ignored packages `{}`'.format(self.ignored_packages))
         self.lambda_config = aws_lambda_config
 
     def create_deployment_package(self):
@@ -56,6 +57,7 @@ class LambdaPackage(object):
         return self.zip_file
 
     def _add_env_libs_and_src(self):
+        LOGGER.info('Add sources and libraries from current environment')
         Repo(path=self.repo).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         package_path = distutils.sysconfig.get_python_lib()
@@ -68,6 +70,7 @@ class LambdaPackage(object):
 
     def _add_shared_lib(self, requirements):
         if requirements:
+            LOGGER.info('Add shared libraries')
             so_dir = os.path.join(self.workspace, 'lib')
             os.mkdir(so_dir)
             so_files = []
@@ -91,6 +94,7 @@ class LambdaPackage(object):
 
     def _add_recompiled_libs(self, requirements):
         if requirements:
+            LOGGER.info('Recompile and add binary requirements')
             pkg_venv = os.path.join(self.workspace, 'env')
             venv_pip = 'bin/pip'
 
@@ -129,6 +133,7 @@ class LambdaPackage(object):
                 shutil.copy(src, dst)
 
     def _create_zip_package(self):
+        LOGGER.info('Add ')
         zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
         abs_src = os.path.abspath(self.workspace)
         for root, _, files in os.walk(self.workspace):
