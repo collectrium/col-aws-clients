@@ -1,7 +1,6 @@
 language: python
 sudo: false
 
-git
 python:
   - "2.7"
 
