@@ -1,3 +1,4 @@
+import os
 import zipfile
 
 from mock import patch
@@ -29,3 +30,9 @@ class EBTest(BaseTest):
         )
 
         eb_deployer.deploy()
+
+    def tearDown(self):
+        try:
+            os.remove('aws.zip')
+        except OSError:
+            pass

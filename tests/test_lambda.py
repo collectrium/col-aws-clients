@@ -1,3 +1,4 @@
+import os
 import zipfile
 
 from mock import patch
@@ -44,3 +45,9 @@ class LambdaTest(BaseTest):
         )
 
         lambda_deployer.deploy()
+
+    def tearDown(self):
+        try:
+            os.remove('lambda.zip')
+        except OSError:
+            pass
