@@ -78,6 +78,14 @@ class AWSMock(object):
                 id=api_id,
                 createdDate=datetime.datetime.utcnow().isoformat(),
             )
+        elif operation_name == 'PutRestApi':
+            return {
+                'id': AWSMock.api_gateway.api['items'][0]['id'],
+                'name': json.loads(kwarg['body'])['info']['title'],
+                'description': '',
+                'createdDate': AWSMock.api_gateway.api['items'][0][
+                    'createdDate'],
+            }
         elif operation_name == 'CreateDeployment':
             deployment_id = random_string(4)
             AWSMock.api_gateway.stages['item'].append(
@@ -315,4 +323,8 @@ class AWSMock(object):
             }
             AWSMock.beanstalk.environments['Environments'].append(response)
             return response
+        elif operation_name == 'UpdateEnvironment':
+            AWSMock.beanstalk.environments['Environments'][0]['DateUpdated'] = \
+                datetime.datetime.utcnow()
+            return AWSMock.beanstalk.environments['Environments'][0]
         return orig(self, operation_name, kwarg)
