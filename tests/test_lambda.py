@@ -45,6 +45,7 @@ class LambdaTest(BaseTest):
         )
 
         lambda_deployer.deploy()
+        lambda_deployer.deploy()
 
     def tearDown(self):
         try:

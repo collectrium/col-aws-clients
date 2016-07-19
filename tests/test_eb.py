@@ -30,6 +30,7 @@ class EBTest(BaseTest):
         )
 
         eb_deployer.deploy()
+        eb_deployer.deploy()
 
     def tearDown(self):
         try:

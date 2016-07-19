@@ -14,6 +14,12 @@ class S3Client(BaseAWSClient):
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key):
+        """
+
+        :param region_name: AWS region name
+        :param aws_access_key_id:  AWS credentials
+        :param aws_secret_access_key: AWS credentials
+        """
         super(S3Client, self).__init__(
             service='s3',
             region_name=region_name,

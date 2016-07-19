@@ -191,7 +191,8 @@ class S3Bucket(object):
         :param payload: byte string or file object
         :param key: path to object on bucket
         :type str
-        :return:
+        :return: presigned url for object
+        :rtype str
         """
         kwargs = dict(
             Body=payload,

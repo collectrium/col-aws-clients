@@ -22,7 +22,7 @@ class LambdaClient(BaseAWSClient):
     ):
         """
 
-        :param region_name: AWS region
+        :param region_name: AWS region name
         :param aws_access_key_id:  AWS credentials
         :param aws_secret_access_key: AWS credentials
         """
@@ -181,7 +181,7 @@ class LambdaClient(BaseAWSClient):
 
     def add_api_gateway_invoke_permission(self, function_name, ):
         """
-        :param function_name:
+        :param function_name: Lambda function name
         :return:
         """
         LOGGER.info('Add API Gateway permission `%s`', function_name)
@@ -194,6 +194,11 @@ class LambdaClient(BaseAWSClient):
         self.instance.add_permission(**permission)
 
     def add_s3_invoke_permission(self, function_name, bucket_name):
+        """
+        :param function_name: Lambda function name
+        :param bucket_name:  S3 bucket name
+        :return:
+        """
         LOGGER.info('Add S3 permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,

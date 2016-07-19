@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import tempfile
@@ -11,9 +12,17 @@ from git import Repo
 from aws_clients.aws_eb.client import ElasticBeanstalkClient
 from aws_clients.aws_s3.s3bucket import S3Bucket
 
+LOGGER = logging.getLogger(__name__)
 
 class EBPackage(object):
     def __init__(self, version, repository=None):
+        """
+        Helper to generate code package
+        :param version: package code version, must be like uuid
+        :type str
+        :param repository: git repository url
+        :type str
+        """
         self.repository = repository or '.'
         self.version = version
         self.workspace = tempfile.mkdtemp()
@@ -22,6 +31,10 @@ class EBPackage(object):
         )
 
     def create_deployment_package(self):
+        """
+        Create deployment zip package
+        :return:
+        """
         Repo(path=self.repository).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
@@ -45,12 +58,26 @@ class EBDeployer(object):
                  zip_file):
         """
 
-        :param region_name:
-        :param aws_access_key_id:
-        :param aws_secret_access_key:
+        :param region_name: AWS region_name
+        :type str
+        :param aws_access_key_id: AWS credentials
+        :type str
+        :param aws_secret_access_key: AWS credentials
+        :type str
         :param applications_config:
-        :param environment:
-        :param zip_file:
+
+        Sample config:
+        {
+            'eb_reindex_worker': {
+                    'type': 'worker',
+                    'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
+
+            }
+        }
+        :param environment: environment name
+        :type str
+        :param zip_file: path to code package
+        :type str
         """
         self.applications_config = applications_config
         self.client = ElasticBeanstalkClient(
@@ -73,6 +100,17 @@ class EBDeployer(object):
                            certificate_body,
                            certificate_private_key,
                            certificate_chain):
+        """
+
+        :param certificate_body: SSL certificate
+        :type str
+        :param certificate_private_key: SSL private key
+        :type str
+        :param certificate_chain: SSL certificate chain
+        :type str
+        :return: IAM certificate id
+        :rtype str
+        """
         iam = boto3.resource('iam', **self.client.settings)
         try:
             response = iam.get_server_certificate(
@@ -137,11 +175,11 @@ class EBDeployer(object):
             option_settings.append(
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="SSLCertificateId",
-                     Value=certificate_id),
+                     Value=certificate_id))
+            option_settings.append(
                 dict(Namespace="aws:elb:listener:80",
                      OptionName="ListenerEnabled",
-                     Value="false")
-            )
+                     Value="false"))
 
         if not self.client.instance.describe_environments(
                 ApplicationName=application_name,
@@ -185,16 +223,8 @@ class EBDeployer(object):
 
     def deploy(self, certificate_id=None):
         """
-        :param applications_config:
-        Sample config:
-        {
-            'eb_reindex_worker': {
-                    'type': 'worker',
-                    'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
-
-            }
-        }
         :param certificate_id: IAM certificate id
+        :type str
         :return:
         """
         for app_name, app_config in self.applications_config.items():

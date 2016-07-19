@@ -12,6 +12,11 @@ class SQSClient(BaseAWSClient):
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key):
+        """
+        :param region_name: AWS region name
+        :param aws_access_key_id:  AWS credentials
+        :param aws_secret_access_key: AWS credentials
+        """
         self.__urls = {}
         super(SQSClient, self).__init__(
             service='sqs',
