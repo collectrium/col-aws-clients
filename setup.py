@@ -5,8 +5,6 @@ setup(
     packages=['aws-clients'],  # this must be the same as the name above
     version='0.1',
     description='Collectrium AWS clients',
-    author='Roman Voronin',
-    author_email='voroninr@gmail.com',
     url='https://github.com/collectrium/col-aws-clients',
     # use the URL to the github repo
     download_url='https://github.com/collectrium/col-aws-clients/tarball/0.1',
