@@ -78,7 +78,7 @@ class SQSClient(BaseAWSClient):
     def get_queue_url(self, queue_name):
         """
         :param queue_name:
-        :type int
+        :type str
         :return: queue url
         :rtype str
         """
