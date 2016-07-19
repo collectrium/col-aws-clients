@@ -18,9 +18,12 @@ class APIGatewayClient(BaseAWSClient):
                  aws_access_key_id,
                  aws_secret_access_key):
         """
-        :param region_name: AWS region
+        :param region_name: AWS region name
+        :type str
         :param aws_access_key_id: AWS credentials
+        :type str
         :param aws_secret_access_key: AWS credentials
+        :type str
         """
         super(APIGatewayClient, self).__init__(
             service='apigateway',
@@ -71,8 +74,11 @@ class APIGatewayClient(BaseAWSClient):
         """
         Deploy stage
         :param api_name: API Gateway visible name
+        :type str
         :param stage: stage name
+        :type str
         :param lambda_function_name: function name for stage
+        :type str
         :return:
         """
         api_id = self.__get_api_id(api_name)
@@ -94,11 +100,15 @@ class APIGatewayClient(BaseAWSClient):
             certificate_chain
     ):
         """
-
-        :param domain_name:
-        :param certificate_body:
-        :param certificate_private_key:
-        :param certificate_chain:
+        Create cusom domain name
+        :param domain_name: custom domain name
+        :type str
+        :param certificate_body:   SSL certificate
+        :type str
+        :param certificate_private_key: SSL private key
+        :type str
+        :param certificate_chain: SSL certificate chain
+        :type str
         :return:
         """
         response = self.instance.get_domain_names()
@@ -116,9 +126,13 @@ class APIGatewayClient(BaseAWSClient):
         """
         Create path mapping
         :param api_name:  API Gateway visible name
+        :type str
         :param stage:  stage
+        :type str
         :param domain_name:  custom domain name
+        :type str
         :param base_path: base pathn for mapping
+        :type str
         :return:
         """
         try:

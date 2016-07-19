@@ -77,3 +77,10 @@ class AGTest(BaseTest):
 
         ag_deployer.deploy_domain(stage='development', base_path='v1',
                                   certificate_body="", certificate_private_key="", certificate_chain='')
+
+        ag_deployer.deploy_stage(stage='development',
+                                     lambda_function_name='api_lambda',
+                                     lambda_version='development')
+
+        ag_deployer.deploy_domain(stage='development', base_path='v1',
+                                  certificate_body="", certificate_private_key="", certificate_chain='')

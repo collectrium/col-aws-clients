@@ -13,7 +13,6 @@ from git import Repo
 
 from aws_clients.aws_lambda.client import LambdaClient
 
-
 LIB_DIRS = (
     "/lib/", "/lib64/",
     "/usr/lib/", "/usr/lib64/",
@@ -21,12 +20,12 @@ LIB_DIRS = (
     "/lib/x86_64-linux-gnu/"
 )
 
-
 LOGGER = logging.getLogger(__name__)
+
 
 class LambdaPackage(object):
     """
-    Helper for creation code package
+    Helper to generate code package
     """
 
     def __init__(self, aws_lambda_config, repository=None):
