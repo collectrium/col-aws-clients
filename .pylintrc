@@ -1,0 +1,19 @@
+[MASTER]
+
+ignore=tests,migrations
+
+disable=missing-docstring,
+        bad-continuation,
+        invalid-name,
+        multiple-statements,
+        old-style-class,
+        no-init,
+        too-few-public-methods,
+        duplicate-code,
+        no-self-use,
+        unused-argument,
+        logging-format-interpolation,
+        too-many-arguments,
+        too-many-nested-blocks
+
+max-line-length=80
