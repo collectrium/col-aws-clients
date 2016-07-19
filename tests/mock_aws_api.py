@@ -58,7 +58,6 @@ class AWSMock(object):
                         'The security token included in the request is invalid.'
                 ) or cle.message.endswith(
                     'The AWS Access Key Id you provided does not exist in our records.')):
-                    print cle.message
                     raise cle
 
         check_exception()

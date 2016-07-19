@@ -1,8 +1,8 @@
 from distutils.core import setup
 
 setup(
-    name='col-aws-clients',
-    packages=['col-aws-clients'],  # this must be the same as the name above
+    name='aws-clients',
+    packages=['aws-clients'],  # this must be the same as the name above
     version='0.1',
     description='Collectrium AWS clients',
     author='Roman Voronin',
