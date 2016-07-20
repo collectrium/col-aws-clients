@@ -4,7 +4,6 @@ import time
 
 from botocore.exceptions import ClientError
 
-from aws_clients.aws_client import BaseAWSClientException
 from .client import LambdaClient
 
 LOGGER = logging.getLogger(__name__)

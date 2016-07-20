@@ -3,12 +3,12 @@ import logging
 import sys
 import zipfile
 
-import aws_clients
-from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
-from aws_clients.aws_lambda.deployment import LambdaDeployer
 # logger = logging.getLogger('AWSClients')
 # fh = logging.FileHandler('deploy.log')
 # logger.addHandler(fh)
+from col_aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
+from col_aws_clients.aws_lambda.deployment import LambdaDeployer
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def debug_deploy(aws_access_key_id, aws_secret_access_key):

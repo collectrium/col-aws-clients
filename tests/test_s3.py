@@ -4,7 +4,7 @@ import datetime
 
 from freezefrog import FreezeTime
 
-from aws_clients.aws_s3.s3bucket import S3Bucket
+from col_aws_clients.aws_s3.s3bucket import S3Bucket
 from tests.base_test import BaseTest
 
 

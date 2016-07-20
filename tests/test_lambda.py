@@ -5,8 +5,8 @@ import zipfile
 from git import Repo
 from mock import patch
 
-from aws_clients.aws_lambda.deployment import LambdaDeployer, LambdaPackage
-from aws_clients.aws_lambda.lambda_function import LambdaFunction
+from col_aws_clients.aws_lambda.deployment import LambdaDeployer, LambdaPackage
+from col_aws_clients.aws_lambda.lambda_function import LambdaFunction
 from tests.base_test import BaseTest
 from tests.mock_aws_api import AWSMock
 

@@ -1,7 +1,7 @@
 import json
 import logging
 
-from aws_clients.aws_api_gateway.client import APIGatewayClient
+from ..aws_api_gateway.client import APIGatewayClient
 
 
 LOGGER = logging.getLogger(__name__)

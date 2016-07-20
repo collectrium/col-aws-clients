@@ -9,8 +9,8 @@ import boto3
 from botocore.exceptions import ClientError
 from git import Repo
 
-from aws_clients.aws_eb.client import ElasticBeanstalkClient
-from aws_clients.aws_s3.s3bucket import S3Bucket
+from ..aws_eb.client import ElasticBeanstalkClient
+from ..aws_s3.s3bucket import S3Bucket
 
 LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class EBPackage(object):
         """
         self.repository = repository or '.'
         self.version = version
+        LOGGER.info('Create workspace')
         self.workspace = tempfile.mkdtemp()
         self.zip_file = os.path.join(
             self.workspace, self.version + '.zip'

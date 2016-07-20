@@ -5,7 +5,7 @@ from cStringIO import StringIO
 
 from mock import patch
 
-from aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
+from col_aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
 from tests.base_test import BaseTest
 from tests.mock_aws_api import AWSMock
 

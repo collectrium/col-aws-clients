@@ -2,7 +2,7 @@ import json
 
 import boto3
 
-from aws_clients.aws_sqs.client import SQSClient
+from ..aws_sqs.client import SQSClient
 
 
 class SQSQueue(object):
