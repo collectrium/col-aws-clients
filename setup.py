@@ -16,17 +16,21 @@ except AttributeError:
 reqs = [str(ir.req) for ir in install_reqs if ir.req]
 
 
+
 packages = find_packages(
     exclude=[
         '*.tests', '*.tests.*', 'tests.*', 'tests',
-        '*.test', '*.test.*', 'test.*', 'test',
+        '*.test', '*.test.*', 'test.*', 'test', 'examples'
     ]
 )
 
-
 setup(
     name='col_aws_clients',
-    packages=['col_aws_clients'],  # this must be the same as the name above
+    author='collectrium',
+    author_email='support@collectrium.com',
+    packages=packages,
+    install_requires=reqs,
+    package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
     version='0.1',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
