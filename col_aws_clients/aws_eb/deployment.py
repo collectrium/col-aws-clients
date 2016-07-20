@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import logging
 import os
 import shutil
@@ -14,6 +16,7 @@ from ..aws_s3.s3bucket import S3Bucket
 
 LOGGER = logging.getLogger(__name__)
 
+
 class EBPackage(object):
     def __init__(self, version, repository=None):
         """
@@ -24,18 +27,27 @@ class EBPackage(object):
         :type str
         """
         self.repository = repository or '.'
+        LOGGER.info('Repository `{}`'.format(self.repository))
         self.version = version
-        LOGGER.info('Create workspace')
         self.workspace = tempfile.mkdtemp()
+        LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(
             self.workspace, self.version + '.zip'
         )
 
-    def create_deployment_package(self):
+    def create_deployment_package(self, additional_files):
         """
         Create deployment zip package
+        :param additional_filesL list of file paths
         :return:
         """
+        if additional_files:
+            for file_path in additional_files:
+                shutil.copyfile(file_path,
+                                os.path.join(
+                                    self.workspace, file_path.split('/')[-1]
+                                ))
+        LOGGER.info('Create deployment package')
         Repo(path=self.repository).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
@@ -96,6 +108,7 @@ class EBDeployer(object):
         )
         self.bucket.upload_from_path(zip_file, self.version + '.zip')
         self.environment = environment
+        LOGGER.info('Environment `{}`'.format(self.environment))
 
     def upload_certificate(self,
                            certificate_body,
@@ -112,6 +125,7 @@ class EBDeployer(object):
         :return: IAM certificate id
         :rtype str
         """
+        LOGGER.info('Upload certificate')
         iam = boto3.resource('iam', **self.client.settings)
         try:
             response = iam.get_server_certificate(
@@ -126,20 +140,24 @@ class EBDeployer(object):
                 CertificateChain=certificate_chain
             )
 
-        return response[
+        certificate_id = response[
             'ServerCertificate'
         ]['ServerCertificateMetadata']['Arn']
+        LOGGER.info('IAM certificate id `{}`'.format(certificate_id))
+        return certificate_id
 
     def __create_applications(self, application_name):
         if not self.client.instance.describe_applications(
                 ApplicationNames=[application_name]
         )['Applications']:
+            LOGGER.info('Create application `{}`'.format(application_name))
             self.client.instance.create_application(
                 ApplicationName=application_name
             )
 
     def __deploy_environments(self, application_name, app_config,
                               certificate_id=None):
+        LOGGER.info('Deploy environment')
         option_settings = [
             dict(OptionName="NumProcesses",
                  Namespace="aws:elasticbeanstalk:container:python",

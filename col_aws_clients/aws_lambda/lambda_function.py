@@ -1,13 +1,12 @@
+from __future__ import unicode_literals
+
 import json
 import logging
 import time
 
-from botocore.exceptions import ClientError
-
 from .client import LambdaClient
 
 LOGGER = logging.getLogger(__name__)
-
 
 
 class LambdaFunction(object):
@@ -39,7 +38,6 @@ class LambdaFunction(object):
         )
         self.function_name = function_name
         self.version = version
-
 
     def __call__(self, payload, async=True):
         """
