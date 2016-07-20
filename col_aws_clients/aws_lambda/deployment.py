@@ -163,7 +163,7 @@ class LambdaDeployer(object):
                  'shedule_expression': "rate(5 minutes)", # set for periodic
                  'event_sources':{
                     'api_gateway':{},
-                    's3':{'bucket': 'test'}
+                    's3':{'bucket': 'test', 'prefix':'upload'}
                  },
                  'memory_size': 128,
                  'timeout': 60,
