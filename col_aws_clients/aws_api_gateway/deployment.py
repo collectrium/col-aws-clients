@@ -1,10 +1,12 @@
+from __future__ import unicode_literals
+
 import json
 import logging
 
 from ..aws_api_gateway.client import APIGatewayClient
 
-
 LOGGER = logging.getLogger(__name__)
+
 
 class APIGatewayDeployer(object):
     def __init__(self,
@@ -53,8 +55,8 @@ class APIGatewayDeployer(object):
 
     def __deploy_stage(self, stage, lambda_function_name, lambda_version=None):
         LOGGER.info('Deploy stage with AWS Lambda `%s` and version `%s`',
-            lambda_function_name, lambda_version
-        )
+                    lambda_function_name, lambda_version
+                    )
         if lambda_version:
             lambda_function_name = "{}:{}".format(
                 lambda_function_name, lambda_version
@@ -78,8 +80,8 @@ class APIGatewayDeployer(object):
 
     def __create_path_mapping(self, stage, base_path):
         LOGGER.info('Create path mapping for stage `%s` with path `%s` ',
-            stage, base_path
-        )
+                    stage, base_path
+                    )
         self.client.create_path_mapping(
             self.api_name,
             stage,

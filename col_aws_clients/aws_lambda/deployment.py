@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import distutils
 import itertools
 import logging
@@ -32,13 +34,34 @@ class LambdaPackage(object):
         """
 
         :param aws_lambda_config:
+         Sample lambda config:
+
+        [  'function_1': {  # function name
+                 'role_name':'lambda_basic_execution', # IAM role for lambda
+                 'handler': 'lambda_module.function_1',  # handler
+                 'shedule_expression': "rate(5 minutes)", # set for periodic
+                 'event_sources':{
+                    'api_gateway':{},
+                    's3':{'bucket': 'test', 'prefix':'upload'}
+                 },
+                 'memory_size': 128,
+                 'timeout': 60,
+
+             },
+             'binary_requirements':{
+                    'psycopg2==2.5.3': ("libpq.so",)
+             },
+             'ignored_packages': ('tests', 'testlib', 'debug')
+        ]
+        :type list
         :param repository:
+        :type str
         """
         self.workspace = tempfile.mkdtemp()
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
-        self.repo = repository or '.'
-        LOGGER.info('Repository `{}`'.format(self.repo))
+        self.repository = repository or '.'
+        LOGGER.info('Repository `{}`'.format(self.repository))
         self.requirements = (aws_lambda_config.pop('binary_requirements')
                              if 'binary_requirements' in aws_lambda_config
                              else None)
@@ -48,16 +71,22 @@ class LambdaPackage(object):
         LOGGER.info('Ignored packages `{}`'.format(self.ignored_packages))
         self.lambda_config = aws_lambda_config
 
-    def create_deployment_package(self):
+    def create_deployment_package(self, additional_files=None):
+        """
+        Create package
+        :param additional_files: list of filepaths
+        :type str
+        :return:
+        """
         self._add_env_libs_and_src()
         self._add_shared_lib(self.requirements)
         self._add_recompiled_libs(self.requirements)
-        self._create_zip_package()
+        self._create_zip_package(additional_files)
         return self.zip_file
 
     def _add_env_libs_and_src(self):
         LOGGER.info('Add sources and libraries from current environment')
-        Repo(path=self.repo).clone(path=self.workspace)
+        Repo(path=self.repository).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         package_path = distutils.sysconfig.get_python_lib()
         self.__add_package_from_path(package_path)
@@ -131,8 +160,14 @@ class LambdaPackage(object):
                     pass
                 shutil.copy(src, dst)
 
-    def _create_zip_package(self):
-        LOGGER.info('Add ')
+    def _create_zip_package(self, additional_files):
+        LOGGER.info('Pack files ')
+        if additional_files:
+            for file_path in additional_files:
+                shutil.copyfile(file_path,
+                                os.path.join(
+                                    self.workspace, file_path.split('/')[-1]
+                                ))
         zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
         abs_src = os.path.abspath(self.workspace)
         for root, _, files in os.walk(self.workspace):
