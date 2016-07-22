@@ -181,7 +181,18 @@ class LambdaClient(BaseAWSClient):
             FunctionVersion=response['Version'],
         )
 
-    def add_api_gateway_invoke_permission(self, function_name, ):
+    def get_function_arn(self, function_name, version=None):
+        kwargs = dict(
+            FunctionName=function_name
+
+        )
+        if version:
+            kwargs.update(Qualifier=version)
+
+        response = self.instance.get_function(**kwargs)
+        return response['FunctionArn']
+
+    def add_api_gateway_invoke_permission(self, function_name):
         """
         :param function_name: Lambda function name
         :return:
@@ -208,5 +219,19 @@ class LambdaClient(BaseAWSClient):
             Action="lambda:InvokeFunction",
             Principal="s3.amazonaws.com",
             SourceArn="arn:aws:s3:::{}".format(bucket_name),
+        )
+        self.instance.add_permission(**permission)
+
+    def add_sns_invoke_permission(self, function_name):
+        """
+        :param function_name:  Lambda function name
+        :return:
+        """
+        LOGGER.info('Add SNS permission `%s`', function_name)
+        permission = dict(
+            FunctionName=function_name,
+            StatementId='8d1f26ba-d229-447e-9c38-b496c624146b',
+            Action="lambda:InvokeFunction",
+            Principal="sns.amazonaws.com",
         )
         self.instance.add_permission(**permission)
