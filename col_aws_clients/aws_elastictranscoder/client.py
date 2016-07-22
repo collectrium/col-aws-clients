@@ -49,7 +49,7 @@ class ElasticTranscoderClient(BaseAWSClient):
         :type int
         :return:
         """
-        response = self.instance.create_preset(
+        self.instance.create_preset(
             Name=preset_name,
             Container='mp4',
             Video={

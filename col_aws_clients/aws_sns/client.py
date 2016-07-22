@@ -52,7 +52,8 @@ class SNSClient(BaseAWSClient):
         :type str
         :param message: message object, must be JSON serializable
         :type str
-        :param protocol: protocol type, it's define endpoint for SNS (AWS Lambda, SQS, HTTP and  etc)
+        :param protocol: protocol type, it's
+        define endpoint for SNS (AWS Lambda, SQS, HTTP and  etc)
         """
         message = json.dumps(
             {'default': 'stub message', protocol: json.dumps(message)})
@@ -69,7 +70,7 @@ class SNSClient(BaseAWSClient):
         :return:
         """
         lambda_client = LambdaClient(**self.settings)
-        response = self.instance.subscribe(
+        self.instance.subscribe(
             TopicArn=self.get_topic_arn(topic_name),
             Protocol='lambda',
             Endpoint=lambda_client.get_function_arn(function_name)
