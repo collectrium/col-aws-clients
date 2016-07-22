@@ -35,13 +35,27 @@ class ElasticTranscoderClient(BaseAWSClient):
             thumbnail_width=None,
             thumbnail_height=None,
     ):
+        """
+        Create video trnsforming presets
+        :param preset_name: name
+        :type str
+        :param width: max output video width
+        :type int
+        :param height: max output video height
+        :type int
+        :param thumbnail_width: max thumbnail video width
+        :type int
+        :param thumbnail_height:  max thumbnail video height
+        :type int
+        :return:
+        """
         response = self.instance.create_preset(
             Name=preset_name,
             Container='mp4',
             Video={
                 'Codec': 'H.264',
-                'MaxWidth': width or '1920',
-                'MaxHeight': height or '1080',
+                'MaxWidth': str(width) or '1920',
+                'MaxHeight': str(height) or '1080',
                 'SizingPolicy': 'ShrinkToFit',
             },
             Audio={
@@ -50,8 +64,8 @@ class ElasticTranscoderClient(BaseAWSClient):
             Thumbnails={
                 'Format': 'png',
                 'Interval': '60',
-                'MaxWidth': thumbnail_width or '1920',
-                'MaxHeight': thumbnail_height or '1080',
+                'MaxWidth': str(thumbnail_width) or '480',
+                'MaxHeight': str(thumbnail_height) or '270',
                 'SizingPolicy': 'ShrinkToFit',
                 'PaddingPolicy': 'NoPad'
             }
@@ -67,6 +81,24 @@ class ElasticTranscoderClient(BaseAWSClient):
             warning_sns_topic=None,
             error_sns_topic=None,
     ):
+        """
+        Create pipeline
+        :param pipeline_name: name
+        :type str
+        :param bucket_name: working bucket name
+        :type str
+        :param role_name:  IAM role name for transcoding
+        :type  str
+          SNS topic for sending notifications
+        :param progressing_sns_topic: for progressing
+        :type str
+        :param completed_sns_topic:  for completed
+        :type str
+        :param warning_sns_topic:  for warning
+        :type str
+        :param error_sns_topic:  for error
+        :return:
+        """
         iam = boto3.resource('iam', **self.settings)
         role = iam.Role(role_name)
         notifications = {}

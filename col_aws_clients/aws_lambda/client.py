@@ -182,6 +182,14 @@ class LambdaClient(BaseAWSClient):
         )
 
     def get_function_arn(self, function_name, version=None):
+        """
+        Return function AWS ARN
+        :param function_name: name
+        :type str
+        :param version: version
+        :type str
+        :return:
+        """
         kwargs = dict(
             FunctionName=function_name
 
