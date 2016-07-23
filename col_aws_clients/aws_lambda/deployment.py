@@ -42,7 +42,9 @@ class LambdaPackage(object):
                  'shedule_expression': "rate(5 minutes)", # set for periodic
                  'event_sources':{
                     'api_gateway':{},
-                    's3':{'bucket': 'test', 'prefix':'upload'}
+                    's3':{'bucket': 'test', 'prefix':'upload'},
+                    'sns':{}
+
                  },
                  'memory_size': 128,
                  'timeout': 60,
@@ -199,6 +201,7 @@ class LambdaDeployer(object):
                  'event_sources':{
                     'api_gateway':{},
                     's3':{'bucket': 'test', 'prefix':'upload'}
+                    'sns':{}
                  },
                  'memory_size': 128,
                  'timeout': 60,
@@ -296,5 +299,7 @@ class LambdaDeployer(object):
                     )
                 elif event_sources and 'api_gateway' in event_sources:
                     self.client.add_api_gateway_invoke_permission(function_name)
+                elif event_sources and 'sns' in event_sources:
+                    self.client.add_sns_invoke_permission(function_name)
             except ClientError:
                 pass

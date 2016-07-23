@@ -82,8 +82,8 @@ class EBDeployer(object):
         Sample config:
         {
             'eb_reindex_worker': {
-                    'type': 'worker',
-                    'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
+                'type': 'worker',
+                'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
 
             }
         }
@@ -230,7 +230,7 @@ class EBDeployer(object):
             )
 
     def __create_applications_version(self, application_name):
-        response = self.client.instance.create_application_version(
+        self.client.instance.create_application_version(
             ApplicationName=application_name,
             Process=False,
             SourceBundle={
