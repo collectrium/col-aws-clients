@@ -129,3 +129,36 @@ class ElasticTranscoderClient(BaseAWSClient):
             kwargs.update(Notifications=notifications)
 
         self.instance.create_pipeline(**kwargs)
+
+    def create_job(self, pipeline, input_key, output_key, preset):
+        """
+        Create transcoding job
+        :param pipeline: pipeline id
+        :param input_key:
+        :param output_key:
+        :param preset:
+        :return:
+        """
+        kwargs = dict(
+            PipelineId=pipeline,
+            Input={
+                'Key': input_key,
+
+            },
+            Output={
+                'Key': output_key,
+                'ThumbnailPattern': "{}-{}".format(
+                    output_key.rsplit('.', 1)[0], '{count}'
+                ),
+                'PresetId': preset,
+            },
+        )
+        response = self.instance.create_job(**kwargs)
+        return response['Id']
+
+    def read_job(self, job_id):
+        """
+        :param job_id:
+        :return:
+        """
+        return self.instance.read_job(Id=job_id)
