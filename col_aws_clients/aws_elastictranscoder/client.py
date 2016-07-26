@@ -54,18 +54,18 @@ class ElasticTranscoderClient(BaseAWSClient):
             Container='mp4',
             Video={
                 'Codec': 'H.264',
-                'MaxWidth': str(width) or '1920',
-                'MaxHeight': str(height) or '1080',
+                'MaxWidth': width or 1920,
+                'MaxHeight': height or 1080,
                 'SizingPolicy': 'ShrinkToFit',
             },
             Audio={
-                'Codec': 'aac',
+                'Codec': 'AAC',
             },
             Thumbnails={
                 'Format': 'png',
                 'Interval': '60',
-                'MaxWidth': str(thumbnail_width) or '480',
-                'MaxHeight': str(thumbnail_height) or '270',
+                'MaxWidth': thumbnail_width or 480,
+                'MaxHeight': thumbnail_height or 270,
                 'SizingPolicy': 'ShrinkToFit',
                 'PaddingPolicy': 'NoPad'
             }
