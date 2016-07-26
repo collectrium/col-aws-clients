@@ -30,10 +30,10 @@ class ElasticTranscoderClient(BaseAWSClient):
     def create_video_preset(
             self,
             preset_name,
-            width=None,
-            height=None,
-            thumbnail_width=None,
-            thumbnail_height=None,
+            width=1920,
+            height=1080,
+            thumbnail_width=480,
+            thumbnail_height=270,
     ):
         """
         Create video trnsforming presets
@@ -64,8 +64,8 @@ class ElasticTranscoderClient(BaseAWSClient):
             Thumbnails={
                 'Format': 'png',
                 'Interval': '60',
-                'MaxWidth': str(thumbnail_width) or '480',
-                'MaxHeight': str(thumbnail_height) or '270',
+                'MaxWidth':  str(thumbnail_width) or '480',
+                'MaxHeight':  str(thumbnail_height) or '270',
                 'SizingPolicy': 'ShrinkToFit',
                 'PaddingPolicy': 'NoPad'
             }
