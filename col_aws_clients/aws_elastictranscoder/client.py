@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import boto3
+
 from col_aws_clients.aws_sns.client import SNSClient
 from ..aws_client import BaseAWSClient
 
@@ -48,27 +49,37 @@ class ElasticTranscoderClient(BaseAWSClient):
         :type int
         :return:
         """
-        self.instance.create_preset(
-            Name=preset_name,
-            Container='mp4',
-            Video={
-                'Codec': 'H.264',
-                'MaxWidth': str(width) or '1920',
-                'MaxHeight': str(height) or '1080',
-                'SizingPolicy': 'ShrinkToFit',
-            },
-            Audio={
-                'Codec': 'AAC',
-            },
-            Thumbnails={
-                'Format': 'png',
-                'Interval': '60',
-                'MaxWidth': str(thumbnail_width) or '480',
-                'MaxHeight': str(thumbnail_height) or '270',
-                'SizingPolicy': 'ShrinkToFit',
-                'PaddingPolicy': 'NoPad'
-            }
-        )
+
+        if not self.get_preset_id(preset_name):
+            self.instance.create_preset(
+                Name=preset_name,
+                Description='',
+                Container='mp4',
+                Video={
+                    'Codec': 'H.264',
+                    'MaxWidth': str(width) or '1920',
+                    'MaxHeight': str(height) or '1080',
+                    'SizingPolicy': 'ShrinkToFit',
+                    'BitRate':'auto',
+                    'FrameRate':'auto',
+                     'CodecOptions':{
+                         'Profile':'baseline'
+                     }
+                },
+                Audio={
+                    'Codec': 'AAC',
+                    'Channels': 'auto',
+                    'SampleRate':'auto'
+                },
+                Thumbnails={
+                    'Format': 'png',
+                    'Interval': '60',
+                    'MaxWidth': str(thumbnail_width) or '480',
+                    'MaxHeight': str(thumbnail_height) or '270',
+                    'SizingPolicy': 'ShrinkToFit',
+                    'PaddingPolicy': 'NoPad'
+                }
+            )
 
     def create_pipeline(
             self,
@@ -135,16 +146,28 @@ class ElasticTranscoderClient(BaseAWSClient):
         """
 
         :param pipeline_name: pipeline name
-        :return:
+        :return: pipeline id
         """
         response = self.instance.list_pipelines()
         ids = [
-            pipeline_name['Id'] for pipeline_name in response['Pipelines']
-            if pipeline_name['Name'] == pipeline_name
+            pipeline['Id'] for pipeline in response['Pipelines']
+            if pipeline['Name'] == pipeline_name
             ]
         return ids and ids[0] or None
 
-    def create_job(self, pipeline_id, input_key, output_key, preset):
+    def get_preset_id(self, preset_name):
+        """
+        :param preset_name: name
+        :return: preset id
+        """
+        response = self.instance.list_presets()
+        ids = [
+            preset['Id'] for preset in response['Presets']
+            if preset['Name'] == preset_name
+            ]
+        return ids and ids[0] or None
+
+    def create_job(self, pipeline_id, input_key, output_key, preset_id):
         """
         Create transcoding job
         :param pipeline_id: pipeline id
@@ -164,7 +187,7 @@ class ElasticTranscoderClient(BaseAWSClient):
                 'ThumbnailPattern': "{}-{}".format(
                     output_key.rsplit('.', 1)[0], '{count}'
                 ),
-                'PresetId': preset,
+                'PresetId': preset_id,
             },
         )
         response = self.instance.create_job(**kwargs)
