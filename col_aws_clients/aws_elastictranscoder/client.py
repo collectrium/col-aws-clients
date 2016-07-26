@@ -198,7 +198,7 @@ class ElasticTranscoderClient(BaseAWSClient):
             },
         )
         response = self.instance.create_job(**kwargs)
-        return response['Id']
+        return response['Job']['Id']
 
     def read_job(self, job_id):
         """
