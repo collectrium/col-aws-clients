@@ -122,9 +122,9 @@ class ElasticTranscoderClient(BaseAWSClient):
         kwargs = dict(
             Name=pipeline_name,
             InputBucket=bucket_name,
-            OutputBucket=bucket_name,
             Role=role.arn,
-            ThumbnailConfig={u'Bucket': bucket_name, u'Permissions': []},
+            ThumbnailConfig={'Bucket': bucket_name},
+            ContentConfig={'Bucket': bucket_name},
         )
         if notifications:
             kwargs.update(Notifications=notifications)
