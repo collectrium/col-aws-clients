@@ -60,16 +60,23 @@ class ElasticTranscoderClient(BaseAWSClient):
                     'MaxWidth': str(width) or '1920',
                     'MaxHeight': str(height) or '1080',
                     'SizingPolicy': 'ShrinkToFit',
-                    'BitRate':'auto',
-                    'FrameRate':'auto',
-                     'CodecOptions':{
-                         'Profile':'baseline'
-                     }
+                    'BitRate': 'auto',
+                    'FrameRate': 'auto',
+                    'PaddingPolicy': 'NoPad',
+                    'DisplayAspectRatio': 'auto',
+                    'FixedGOP': 'false',
+                    'KeyframesMaxDist': '90',
+                    'CodecOptions': {
+                        'Profile': 'baseline',
+                        'MaxReferenceFrames': '3',
+                        'Level': '4',
+                    }
                 },
                 Audio={
                     'Codec': 'AAC',
                     'Channels': 'auto',
-                    'SampleRate':'auto'
+                    'SampleRate': 'auto',
+                    'BitRate': '160',
                 },
                 Thumbnails={
                     'Format': 'png',
