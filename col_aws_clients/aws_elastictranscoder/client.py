@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import boto3
-
 from col_aws_clients.aws_sns.client import SNSClient
 from ..aws_client import BaseAWSClient
 
@@ -64,8 +63,8 @@ class ElasticTranscoderClient(BaseAWSClient):
             Thumbnails={
                 'Format': 'png',
                 'Interval': '60',
-                'MaxWidth':  str(thumbnail_width) or '480',
-                'MaxHeight':  str(thumbnail_height) or '270',
+                'MaxWidth': str(thumbnail_width) or '480',
+                'MaxHeight': str(thumbnail_height) or '270',
                 'SizingPolicy': 'ShrinkToFit',
                 'PaddingPolicy': 'NoPad'
             }
@@ -99,49 +98,63 @@ class ElasticTranscoderClient(BaseAWSClient):
         :param error_sns_topic:  for error
         :return:
         """
-        iam = boto3.resource('iam', **self.settings)
-        role = iam.Role(role_name)
-        notifications = {}
-        sns = SNSClient(**self.settings)
-        if progressing_sns_topic:
-            notifications['Progressing'] = sns.get_topic_arn(
-                progressing_sns_topic
+        if not self.get_pipeline_id(pipeline_name):
+            iam = boto3.resource('iam', **self.settings)
+            role = iam.Role(role_name)
+            notifications = {}
+            sns = SNSClient(**self.settings)
+            if progressing_sns_topic:
+                notifications['Progressing'] = sns.get_topic_arn(
+                    progressing_sns_topic
+                )
+            if completed_sns_topic:
+                notifications['Completed'] = sns.get_topic_arn(
+                    completed_sns_topic
+                )
+            if warning_sns_topic:
+                notifications['Warning'] = sns.get_topic_arn(
+                    warning_sns_topic
+                )
+            if error_sns_topic:
+                notifications['Error'] = sns.get_topic_arn(
+                    error_sns_topic
+                )
+            kwargs = dict(
+                Name=pipeline_name,
+                InputBucket=bucket_name,
+                Role=role.arn,
+                ThumbnailConfig={'Bucket': bucket_name},
+                ContentConfig={'Bucket': bucket_name},
             )
-        if completed_sns_topic:
-            notifications['Completed'] = sns.get_topic_arn(
-                completed_sns_topic
-            )
-        if warning_sns_topic:
-            notifications['Warning'] = sns.get_topic_arn(
-                warning_sns_topic
-            )
-        if error_sns_topic:
-            notifications['Error'] = sns.get_topic_arn(
-                error_sns_topic
-            )
-        kwargs = dict(
-            Name=pipeline_name,
-            InputBucket=bucket_name,
-            Role=role.arn,
-            ThumbnailConfig={'Bucket': bucket_name},
-            ContentConfig={'Bucket': bucket_name},
-        )
-        if notifications:
-            kwargs.update(Notifications=notifications)
+            if notifications:
+                kwargs.update(Notifications=notifications)
 
-        self.instance.create_pipeline(**kwargs)
+            self.instance.create_pipeline(**kwargs)
 
-    def create_job(self, pipeline, input_key, output_key, preset):
+    def get_pipeline_id(self, pipeline_name):
+        """
+
+        :param pipeline_name: pipeline name
+        :return:
+        """
+        response = self.instance.list_pipelines()
+        ids = [
+            pipeline_name['Id'] for pipeline_name in response['Pipelines']
+            if pipeline_name['Name'] == pipeline_name
+            ]
+        return ids and ids[0] or None
+
+    def create_job(self, pipeline_id, input_key, output_key, preset):
         """
         Create transcoding job
-        :param pipeline: pipeline id
+        :param pipeline_id: pipeline id
         :param input_key:
         :param output_key:
         :param preset:
         :return:
         """
         kwargs = dict(
-            PipelineId=pipeline,
+            PipelineId=pipeline_id,
             Input={
                 'Key': input_key,
 
