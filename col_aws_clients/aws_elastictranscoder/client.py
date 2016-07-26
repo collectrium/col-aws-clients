@@ -122,6 +122,7 @@ class ElasticTranscoderClient(BaseAWSClient):
         kwargs = dict(
             Name=pipeline_name,
             InputBucket=bucket_name,
+            OutputBucket=bucket_name,
             Role=role.arn,
             ThumbnailConfig={u'Bucket': bucket_name, u'Permissions': []},
         )
