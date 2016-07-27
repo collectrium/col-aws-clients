@@ -200,9 +200,9 @@ class ElasticTranscoderClient(BaseAWSClient):
         response = self.instance.create_job(**kwargs)
         return response['Job']['Id']
 
-    def read_job(self, job_id):
+    def get_job_status(self, job_id):
         """
         :param job_id:
         :return:
         """
-        return self.instance.read_job(Id=job_id)
+        return self.instance.read_job(Id=job_id)['Job']['Status'].lower()
