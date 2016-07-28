@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import tempfile
 import zipfile
+from random import choice
+from string import ascii_lowercase
 
 import boto3
 from botocore.exceptions import ClientError
@@ -59,7 +61,9 @@ class LambdaPackage(object):
         :param repository:
         :type str
         """
-        self.workspace = tempfile.mkdtemp()
+        self.workspace = tempfile.gettempdir() + (''.join(choice(
+            ascii_lowercase) for _ in range(10)))
+
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
         self.repository = repository or '.'

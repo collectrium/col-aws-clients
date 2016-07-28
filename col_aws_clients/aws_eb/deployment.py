@@ -6,6 +6,8 @@ import shutil
 import tempfile
 import uuid
 import zipfile
+from random import choice
+from string import ascii_lowercase
 
 import boto3
 from botocore.exceptions import ClientError
@@ -29,7 +31,9 @@ class EBPackage(object):
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.version = version
-        self.workspace = tempfile.mkdtemp()
+        self.workspace = tempfile.gettempdir() + (''.join(choice(
+            ascii_lowercase) for _ in range(10)))
+
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(
             self.workspace, self.version + '.zip'
@@ -41,14 +45,14 @@ class EBPackage(object):
         :param additional_filesL list of file paths
         :return:
         """
+        LOGGER.info('Create deployment package')
+        Repo(path=self.repository).clone(path=self.workspace)
         if additional_files:
             for file_path in additional_files:
                 shutil.copyfile(file_path,
                                 os.path.join(
                                     self.workspace, file_path.split('/')[-1]
                                 ))
-        LOGGER.info('Create deployment package')
-        Repo(path=self.repository).clone(path=self.workspace)
         shutil.rmtree(os.path.join(self.workspace, '.git'))
         zip_file = zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED)
         abs_src = os.path.abspath(self.workspace)
