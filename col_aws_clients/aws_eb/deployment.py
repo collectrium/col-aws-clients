@@ -115,6 +115,7 @@ class EBDeployer(object):
         LOGGER.info('Environment `{}`'.format(self.environment))
 
     def upload_certificate(self,
+                           certificate_name,
                            certificate_body,
                            certificate_private_key,
                            certificate_chain):
@@ -138,7 +139,7 @@ class EBDeployer(object):
         except ClientError:
             response = iam.upload_server_certificate(
                 Path='/elasticbeanstalk/',
-                ServerCertificateName='collectrium',
+                ServerCertificateName=certificate_name,
                 CertificateBody=certificate_body,
                 PrivateKey=certificate_private_key,
                 CertificateChain=certificate_chain
