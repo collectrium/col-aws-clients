@@ -131,7 +131,7 @@ class EBDeployer(object):
         :rtype str
         """
         LOGGER.info('Upload certificate')
-        iam = boto3.resource('iam', **self.client.settings)
+        iam = boto3.client('iam', **self.client.settings)
         try:
             response = iam.get_server_certificate(
                 ServerCertificateName='collectrium'
