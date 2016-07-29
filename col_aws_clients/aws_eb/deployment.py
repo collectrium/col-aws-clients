@@ -254,4 +254,7 @@ class EBDeployer(object):
         for app_name, app_config in self.applications_config.items():
             self.__create_applications(app_name)
             self.__create_applications_version(app_name)
-            self.__deploy_environments(app_name, app_config)
+            args = [app_name, app_config]
+            if certificate_id:
+                args.append(certificate_id)
+            self.__deploy_environments(*args)
