@@ -133,17 +133,19 @@ class EBDeployer(object):
         LOGGER.info('Upload certificate')
         iam = boto3.client('iam', **self.client.settings)
         try:
-            response = iam.get_server_certificate(
-                ServerCertificateName='collectrium'
+            response = iam.delete_server_certificate(
+                ServerCertificateName=certificate_name
             )
         except ClientError:
-            response = iam.upload_server_certificate(
-                Path='/elasticbeanstalk/',
-                ServerCertificateName=certificate_name,
-                CertificateBody=certificate_body,
-                PrivateKey=certificate_private_key,
-                CertificateChain=certificate_chain
-            )
+            pass
+
+        response = iam.upload_server_certificate(
+            Path='/elasticbeanstalk/',
+            ServerCertificateName=certificate_name,
+            CertificateBody=certificate_body,
+            PrivateKey=certificate_private_key,
+            CertificateChain=certificate_chain
+        )
 
         certificate_id = response[
             'ServerCertificate'
@@ -199,8 +201,8 @@ class EBDeployer(object):
                      Value="false"))
             option_settings.append(
                 dict(Namespace="aws:elb:listener:443",
-                 OptionName="ListenerProtocol",
-                 Value="HTTPS"))
+                     OptionName="ListenerProtocol",
+                     Value="HTTPS"))
             option_settings.append(
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="SSLCertificateId",
