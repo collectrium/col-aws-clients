@@ -189,21 +189,22 @@ class EBDeployer(object):
                  OptionName='WSGIPath',
                  Value=app_config.get('wsgi', 'application.py')
                  ),
-            dict(Namespace="aws:elb:listener:443",
-                 OptionName="ListenerProtocol",
-                 Value="HTTPS"),
 
         ]
 
         if certificate_id:
             option_settings.append(
-                dict(Namespace="aws:elb:listener:443",
-                     OptionName="SSLCertificateId",
-                     Value=certificate_id))
-            option_settings.append(
                 dict(Namespace="aws:elb:listener:80",
                      OptionName="ListenerEnabled",
                      Value="false"))
+            option_settings.append(
+                dict(Namespace="aws:elb:listener:443",
+                 OptionName="ListenerProtocol",
+                 Value="HTTPS"))
+            option_settings.append(
+                dict(Namespace="aws:elb:listener:443",
+                     OptionName="SSLCertificateId",
+                     Value=certificate_id))
 
         if not self.client.instance.describe_environments(
                 ApplicationName=application_name,
