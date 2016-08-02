@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import logging
-import os
 import shutil
 import tempfile
 import uuid
@@ -10,9 +9,9 @@ from random import choice
 from string import ascii_lowercase
 
 import boto3
+import os
 from botocore.exceptions import ClientError
 from git import Repo
-
 from ..aws_eb.client import ElasticBeanstalkClient
 from ..aws_s3.s3bucket import S3Bucket
 
@@ -130,28 +129,45 @@ class EBDeployer(object):
         :return: IAM certificate id
         :rtype str
         """
+
         LOGGER.info('Upload certificate')
         iam = boto3.client('iam', **self.client.settings)
+
         try:
-            response = iam.delete_server_certificate(
-                ServerCertificateName=certificate_name
+            iam.delete_server_certificate(
+                ServerCertificateName=certificate_name,
+            )
+        except ClientError:
+            pass
+        try:
+            iam.delete_server_certificate(
+                ServerCertificateName=certificate_name + '.new',
             )
         except ClientError:
             pass
 
-        response = iam.upload_server_certificate(
-            Path='/elasticbeanstalk/',
-            ServerCertificateName=certificate_name,
-            CertificateBody=certificate_body,
-            PrivateKey=certificate_private_key,
-            CertificateChain=certificate_chain
-        )
-
-        certificate_id = response[
-            'ServerCertificate'
-        ]['ServerCertificateMetadata']['Arn']
-        LOGGER.info('IAM certificate id `{}`'.format(certificate_id))
-        return certificate_id
+        try:
+            response = iam.upload_server_certificate(
+                Path='/elasticbeanstalk/',
+                ServerCertificateName=certificate_name,
+                CertificateBody=certificate_body,
+                PrivateKey=certificate_private_key,
+                CertificateChain=certificate_chain
+            )
+        except ClientError:
+            response = iam.upload_server_certificate(
+                Path='/elasticbeanstalk/',
+                ServerCertificateName=certificate_name + '.new',
+                CertificateBody=certificate_body,
+                PrivateKey=certificate_private_key,
+                CertificateChain=certificate_chain
+            )
+        certificate_arn = response['ServerCertificateMetadata'][
+            'Arn']
+        LOGGER.info('Use certificate {}'.format(
+            response['ServerCertificateMetadata']['ServerCertificateName']))
+        LOGGER.info('IAM certificate id `{}`'.format(certificate_arn))
+        return certificate_arn
 
     def __create_applications(self, application_name):
         if not self.client.instance.describe_applications(
@@ -163,7 +179,7 @@ class EBDeployer(object):
             )
 
     def __deploy_environments(self, application_name, app_config,
-                              certificate_id=None):
+                              certificate_arn=None):
         LOGGER.info('Deploy environment')
         option_settings = [
             dict(OptionName="NumProcesses",
@@ -194,7 +210,7 @@ class EBDeployer(object):
 
         ]
 
-        if certificate_id:
+        if certificate_arn:
             option_settings.append(
                 dict(Namespace="aws:elb:listener:80",
                      OptionName="ListenerEnabled",
@@ -206,7 +222,7 @@ class EBDeployer(object):
             option_settings.append(
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="SSLCertificateId",
-                     Value=certificate_id))
+                     Value=certificate_arn))
 
         if not self.client.instance.describe_environments(
                 ApplicationName=application_name,
@@ -248,9 +264,9 @@ class EBDeployer(object):
             VersionLabel=self.version,
         )
 
-    def deploy(self, certificate_id=None):
+    def deploy(self, certificate_arn=None):
         """
-        :param certificate_id: IAM certificate id
+        :param certificate_arn: IAM certificate id
         :type str
         :return:
         """
@@ -258,6 +274,6 @@ class EBDeployer(object):
             self.__create_applications(app_name)
             self.__create_applications_version(app_name)
             args = [app_name, app_config]
-            if certificate_id:
-                args.append(certificate_id)
+            if certificate_arn:
+                args.append(certificate_arn)
             self.__deploy_environments(*args)
