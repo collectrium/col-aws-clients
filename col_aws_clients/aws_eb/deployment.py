@@ -193,13 +193,13 @@ class EBDeployer(object):
                  Namespace="aws:autoscaling:asg",
                  Value=
                  str(app_config.get('instances_autoscaling_range',
-                                    (1, 1))[0])),
+                                    (1, 4))[0])),
             dict(OptionName="MaxSize",
                  ResourceName="AWSEBAutoScalingGroup",
                  Namespace="aws:autoscaling:asg",
                  Value=
                  str(app_config.get('instances_autoscaling_range',
-                                    (1, 1))[1])),
+                                    (1, 4))[1])),
             dict(OptionName="InstanceType",
                  Namespace="aws:autoscaling:launchconfiguration",
                  Value=app_config.get('instance_type', 't2.micro')),
