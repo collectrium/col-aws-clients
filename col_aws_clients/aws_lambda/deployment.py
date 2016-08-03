@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import distutils
-import itertools
 import logging
 import os
 import shutil
@@ -113,8 +112,8 @@ class LambdaPackage(object):
                     modules = [os.path.join(lib_dir, path)
                                for path in os.listdir(lib_dir)]
                     for module in modules:
-                        for shared_object in itertools.chain(
-                                requirements.values()
+                        for shared_object in (
+                                lib for libs in requirements.values() for lib in libs
                         ):
                             if shared_object in module:
                                 so_files.append(os.path.join(lib_dir, module))
