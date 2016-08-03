@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import os
 import shutil
 import tempfile
 import uuid
@@ -9,9 +10,9 @@ from random import choice
 from string import ascii_lowercase
 
 import boto3
-import os
 from botocore.exceptions import ClientError
 from git import Repo
+
 from ..aws_eb.client import ElasticBeanstalkClient
 from ..aws_s3.s3bucket import S3Bucket
 
@@ -212,10 +213,6 @@ class EBDeployer(object):
 
         if certificate_arn:
             option_settings.append(
-                dict(Namespace="aws:elb:listener:80",
-                     OptionName="ListenerEnabled",
-                     Value="false"))
-            option_settings.append(
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="ListenerProtocol",
                      Value="HTTPS"))
@@ -223,6 +220,7 @@ class EBDeployer(object):
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="SSLCertificateId",
                      Value=certificate_arn))
+
 
         if not self.client.instance.describe_environments(
                 ApplicationName=application_name,
