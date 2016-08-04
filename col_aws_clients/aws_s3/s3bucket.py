@@ -290,6 +290,6 @@ class S3Bucket(object):
         :return: length in bytes
         """
         response = self.client.instance.head_object(
-            S3Bucket=self.bucket_name,
+            Bucket=self.bucket_name,
             Key=key)
         return response.get('ContentLength', 0)
