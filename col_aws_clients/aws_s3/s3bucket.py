@@ -89,7 +89,7 @@ class S3Bucket(object):
                      url_expiration_time=604800,  # 60*60*24*7s
                      force_http_url=False,
                      content_type=None,
-                    ):
+                     ):
         """
         Generate presigned url for object on bucket
         :param key:  path to object on bucket
@@ -129,12 +129,12 @@ class S3Bucket(object):
         return presigned_url
 
     def generate_cloudfront_url(self,
-                                 key,
-                                 cloudfront_domain,
-                                 cloudfront_key_id,
-                                 cloudfront_private_key,
-                                 url_expiration_time=604800,  # 60*60*24*7s
-                                 force_http_url=False
+                                key,
+                                cloudfront_domain,
+                                cloudfront_key_id,
+                                cloudfront_private_key,
+                                url_expiration_time=604800,  # 60*60*24*7s
+                                force_http_url=False
                                 ):
         """
         Generate presigned url for object on bucket
@@ -146,7 +146,6 @@ class S3Bucket(object):
         """
         if key is None:
             return
-
 
         key = key.lstrip('/')
 
@@ -275,7 +274,7 @@ class S3Bucket(object):
     def make_private(self, key):
         """
         Set bucket-owner-full-control ACL for key
-        :param key: path to objecton bucket
+        :param key: path to object on bucket
         :type str
         """
         self.client.instance.put_object_acl(
@@ -283,3 +282,14 @@ class S3Bucket(object):
             Bucket=self.bucket_name,
             Key=key
         )
+
+    def get_file_size(self, key):
+        """
+        Return file size without downloading
+        :param key:  path to object on bucket
+        :return: length in bytes
+        """
+        response = self.client.instance.head_object(
+            S3Bucket=self.bucket_name,
+            Key=key)
+        return response.get('ContentLength', 0)
