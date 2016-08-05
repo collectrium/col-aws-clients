@@ -208,7 +208,18 @@ class EBDeployer(object):
                  OptionName='WSGIPath',
                  Value=app_config.get('wsgi', 'application.py')
                  ),
+            dict(Namespace='aws:elb:listener:80',
+                 OptionName='InstancePort',
+                 Value="80"
+                 ),
+            dict(Namespace='aws:elb:listener:80',
+                 OptionName='InstanceProtocol',
+                 Value="HTTP"
+                 ),
 
+            dict(Namespace="aws:elasticbeanstalk:application",
+                 OptionName="Application Healthcheck URL",
+                 Value=app_config.get('health', "/"))
         ]
 
         if certificate_arn:
@@ -220,7 +231,10 @@ class EBDeployer(object):
                 dict(Namespace="aws:elb:listener:443",
                      OptionName="SSLCertificateId",
                      Value=certificate_arn))
-
+            option_settings.append(
+                dict(Namespace="aws:elb:listener:80",
+                     OptionName="ListenerEnabled",
+                     Value="false"))
 
         if not self.client.instance.describe_environments(
                 ApplicationName=application_name,
