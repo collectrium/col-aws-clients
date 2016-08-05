@@ -238,7 +238,17 @@ class EBDeployer(object):
                 dict(Namespace="aws:elb:healthcheck",
                      OptionName="Target",
                      ResourceName="AWSEBLoadBalancer",
-                     Value="HTTPS:443{}".format(app_config.get('health', '/'))))
+                     Value=app_config.get('health', '/')))
+            option_settings.append(
+                dict(Namespace='aws:elb:listener:443',
+                     OptionName='InstancePort',
+                     Value="80"
+                     ))
+            option_settings.append(
+                dict(Namespace='aws:elb:listener:443',
+                     OptionName='InstanceProtocol',
+                     Value="HTTP"
+                     ))
         else:
             option_settings.append(
                 dict(Namespace="aws:elb:healthcheck",
