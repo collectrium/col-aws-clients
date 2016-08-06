@@ -206,3 +206,11 @@ class ElasticTranscoderClient(BaseAWSClient):
         :return:
         """
         return self.instance.read_job(Id=job_id)['Job']['Status'].lower()
+
+
+    def get_metadata(self, job_id):
+        """
+        :param job_id:
+        :return:
+        """
+        return self.instance.read_job(Id=job_id)['Job']
