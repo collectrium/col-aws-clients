@@ -231,11 +231,7 @@ class EBDeployer(object):
                      OptionName="SSLCertificateId",
                      Value=certificate_arn))
             option_settings.append(
-                dict(Namespace="aws:elb:listener:80",
-                     OptionName="ListenerEnabled",
-                     Value="false"))
-            option_settings.append(
-                dict(Namespace="aws:elb:healthcheck",
+                dict(Namespace="aws:elb:healthcheck" ,
                      OptionName="Target",
                      ResourceName="AWSEBLoadBalancer",
                      Value=app_config.get('health', '/')))
