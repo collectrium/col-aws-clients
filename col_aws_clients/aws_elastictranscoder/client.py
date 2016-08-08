@@ -222,5 +222,5 @@ class ElasticTranscoderClient(BaseAWSClient):
             ).get('DetectedProperties', {}).get('FileSize', None),
             size_transcoded=response.get(
                 'Output', {}
-            ).get('DetectedProperties', {}).get('FileSize', None),
+            ).get('FileSize', None),
         )
