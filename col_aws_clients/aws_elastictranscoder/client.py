@@ -205,12 +205,22 @@ class ElasticTranscoderClient(BaseAWSClient):
         :param job_id:
         :return:
         """
-        return self.instance.read_job(Id=job_id)['Job']['Status'].lower()
-
-
-    def get_metadata(self, job_id):
-        """
-        :param job_id:
-        :return:
-        """
-        return self.instance.read_job(Id=job_id)['Job']
+        response = self.instance.read_job(Id=job_id)['Job']
+        return dict(
+            status=response['Status'].lower(),
+            runtime=response.get(
+                'Input', {}
+            ).get('DetectedProperties', {}).get('DurationMillis', None),
+            height_original=response.get(
+                'Input', {}
+            ).get('DetectedProperties', {}).get('Height', None),
+            width_original=response.get(
+                'Input', {}
+            ).get('DetectedProperties', {}).get('Width', None),
+            size_original=response.get(
+                'Input', {}
+            ).get('DetectedProperties', {}).get('FileSize', None),
+            size_transcoded=response.get(
+                'Output', {}
+            ).get('DetectedProperties', {}).get('FileSize', None),
+        )
