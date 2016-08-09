@@ -15,6 +15,7 @@ from botocore.exceptions import ClientError
 from git import Repo
 
 from ..aws_lambda.client import LambdaClient
+from ..aws_s3.client import S3Client
 
 LIB_DIRS = (
     "/lib/", "/lib64/",
@@ -301,9 +302,40 @@ class LambdaDeployer(object):
                         function_name,
                         event_sources['s3']['bucket_name']
                     )
+                    self._add_s3_notification(
+                        self.arns[function_name],
+                        event_sources['s3']['bucket_name'],
+                        event_sources['s3']['prefix']
+                    )
                 elif event_sources and 'api_gateway' in event_sources:
                     self.client.add_api_gateway_invoke_permission(function_name)
                 elif event_sources and 'sns' in event_sources:
                     self.client.add_sns_invoke_permission(function_name)
             except ClientError:
                 pass
+
+    def __add_s3_notification(self, lambda_arn, bucket_name, prefix):
+        s3 = S3Client(**self.client.settings)
+
+        notification_spec = {
+            'LambdaFunctionConfigurations': [
+                {
+                    'Events': ['s3:ObjectCreated:*', ],
+                    'LambdaFunctionArn': lambda_arn,
+                    'Filter': {
+                        'Key': {
+                            'FilterRules': [
+                                {
+                                    'Name': 'prefix',
+                                    'Value': prefix
+                                },
+                            ]
+                        }
+                    }
+                }
+            ],
+        }
+        s3.instance.put_bucket_notification_configuration(
+            Bucket=bucket_name,
+            NotificationConfiguration=notification_spec
+        )
