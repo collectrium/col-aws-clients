@@ -210,17 +210,18 @@ class ElasticTranscoderClient(BaseAWSClient):
             status=response['Status'].lower(),
             runtime=response.get(
                 'Input', {}
-            ).get('DetectedProperties', {}).get('DurationMillis', None),
+            ).get('DetectedProperties', {}).get('DurationMillis'),
             height_original=response.get(
                 'Input', {}
-            ).get('DetectedProperties', {}).get('Height', None),
+            ).get('DetectedProperties', {}).get('Height'),
             width_original=response.get(
                 'Input', {}
-            ).get('DetectedProperties', {}).get('Width', None),
+            ).get('DetectedProperties', {}).get('Width'),
             size_original=response.get(
                 'Input', {}
-            ).get('DetectedProperties', {}).get('FileSize', None),
+            ).get('DetectedProperties', {}).get('FileSize'),
             size_transcoded=response.get(
                 'Output', {}
-            ).get('FileSize', None),
+            ).get('FileSize'),
+            aspect_ratio =response.get('Input', {}).get('AspectRatio')
         )
