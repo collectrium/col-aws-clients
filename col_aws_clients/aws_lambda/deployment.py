@@ -239,6 +239,7 @@ class LambdaDeployer(object):
         self._upload()
         self._set_shedule()
         self._add_permissions()
+        self._add_triggers()
 
     def _upload(self):
         for function_name, function_config in self.lambda_config.items():
@@ -302,11 +303,7 @@ class LambdaDeployer(object):
                         function_name,
                         event_sources['s3']['bucket_name']
                     )
-                    self._add_s3_notification(
-                        self.arns[function_name],
-                        event_sources['s3']['bucket_name'],
-                        event_sources['s3']['prefix']
-                    )
+
                 elif event_sources and 'api_gateway' in event_sources:
                     self.client.add_api_gateway_invoke_permission(function_name)
                 elif event_sources and 'sns' in event_sources:
@@ -314,28 +311,36 @@ class LambdaDeployer(object):
             except ClientError:
                 pass
 
-    def __add_s3_notification(self, lambda_arn, bucket_name, prefix):
-        s3 = S3Client(**self.client.settings)
-
-        notification_spec = {
-            'LambdaFunctionConfigurations': [
-                {
-                    'Events': ['s3:ObjectCreated:*', ],
-                    'LambdaFunctionArn': lambda_arn,
-                    'Filter': {
-                        'Key': {
-                            'FilterRules': [
-                                {
-                                    'Name': 'prefix',
-                                    'Value': prefix
-                                },
-                            ]
-                        }
+    def _add_triggers(self):
+        s3 = None
+        for function_name, function_config in self.lambda_config.items():
+            event_sources = function_config.get('event_sources', None)
+            try:
+                if event_sources and 's3' in event_sources:
+                    s3 = s3 or S3Client(**self.client.settings)
+                    notification_spec = {
+                        'LambdaFunctionConfigurations': [
+                            {
+                                'Events': ['s3:ObjectCreated:*', ],
+                                'LambdaFunctionArn': self.arns[function_name],
+                                'Filter': {
+                                    'Key': {
+                                        'FilterRules': [
+                                            {
+                                                'Name': 'prefix',
+                                                'Value': event_sources['s3'][
+                                                    'prefix']
+                                            },
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
                     }
-                }
-            ],
-        }
-        s3.instance.put_bucket_notification_configuration(
-            Bucket=bucket_name,
-            NotificationConfiguration=notification_spec
-        )
+
+                    s3.instance.put_bucket_notification_configuration(
+                        Bucket=event_sources['s3']['bucket_name'],
+                        NotificationConfiguration=notification_spec
+                    )
+            except ClientError:
+                pass
