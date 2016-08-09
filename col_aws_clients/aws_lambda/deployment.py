@@ -60,8 +60,8 @@ class LambdaPackage(object):
         :param repository:
         :type str
         """
-        self.workspace = tempfile.gettempdir() + (''.join(choice(
-            ascii_lowercase) for _ in range(10)))
+        self.workspace = os.path.join(tempfile.gettempdir(), (''.join(choice(
+            ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(self.workspace, 'lambda.zip')
@@ -113,7 +113,8 @@ class LambdaPackage(object):
                                for path in os.listdir(lib_dir)]
                     for module in modules:
                         for shared_object in (
-                                lib for libs in requirements.values() for lib in libs
+                                lib for libs in requirements.values() for lib in
+                                libs
                         ):
                             if shared_object in module:
                                 so_files.append(os.path.join(lib_dir, module))
