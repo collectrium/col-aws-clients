@@ -317,7 +317,15 @@ class LambdaDeployer(object):
             event_sources = function_config.get('event_sources', None)
             try:
                 if event_sources and 's3' in event_sources:
-                    s3 = s3 or S3Client(**self.client.settings)
+                    s3 = s3 or S3Client(
+                        region_name=self.client.settings['region_name'],
+                        aws_access_key_id=self.client.settings[
+                            'aws_access_key_id'],
+                        aws_secret_access_key=self.client.settings[
+                            'aws_secret_access_key'
+                        ],
+
+                    )
                     notification_spec = {
                         'LambdaFunctionConfigurations': [
                             {
