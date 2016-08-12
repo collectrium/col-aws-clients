@@ -9,8 +9,6 @@ import zipfile
 from random import choice
 from string import ascii_lowercase
 
-import boto3
-from botocore.exceptions import ClientError
 from git import Repo
 
 from ..aws_eb.client import ElasticBeanstalkClient
@@ -113,61 +111,6 @@ class EBDeployer(object):
         self.bucket.upload_from_path(zip_file, self.version + '.zip')
         self.environment = environment
         LOGGER.info('Environment `{}`'.format(self.environment))
-
-    def upload_certificate(self,
-                           certificate_name,
-                           certificate_body,
-                           certificate_private_key,
-                           certificate_chain):
-        """
-
-        :param certificate_body: SSL certificate
-        :type str
-        :param certificate_private_key: SSL private key
-        :type str
-        :param certificate_chain: SSL certificate chain
-        :type str
-        :return: IAM certificate id
-        :rtype str
-        """
-
-        LOGGER.info('Upload certificate')
-        iam = boto3.client('iam', **self.client.settings)
-
-        try:
-            iam.delete_server_certificate(
-                ServerCertificateName=certificate_name,
-            )
-        except ClientError:
-            pass
-
-        try:
-            response = iam.upload_server_certificate(
-                Path='/elasticbeanstalk/',
-                ServerCertificateName=certificate_name,
-                CertificateBody=certificate_body,
-                PrivateKey=certificate_private_key,
-                CertificateChain=certificate_chain
-            )
-        except ClientError:
-            certificate_arn = response['ServerCertificateMetadata'][
-                'Arn']
-            LOGGER.info('Use certificate {}'.format(
-                response['ServerCertificateMetadata']['ServerCertificateName']))
-            LOGGER.info('IAM certificate id `{}`'.format(certificate_arn))
-            return certificate_arn
-
-    def get_certificate(self, certificate_name):
-        """
-
-        :param certificate_name:
-        :return:
-        """
-        iam = boto3.client('iam', **self.client.settings)
-        response = iam.get_server_certificate(
-            ServerCertificateName=certificate_name
-        )
-        return response['ServerCertificate']['ServerCertificateMetadata']['Arn']
 
     def __create_applications(self, application_name):
         if not self.client.instance.describe_applications(
