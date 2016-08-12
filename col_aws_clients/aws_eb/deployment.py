@@ -140,12 +140,6 @@ class EBDeployer(object):
             )
         except ClientError:
             pass
-        try:
-            iam.delete_server_certificate(
-                ServerCertificateName=certificate_name + '.new',
-            )
-        except ClientError:
-            pass
 
         try:
             response = iam.upload_server_certificate(
@@ -156,19 +150,24 @@ class EBDeployer(object):
                 CertificateChain=certificate_chain
             )
         except ClientError:
-            response = iam.upload_server_certificate(
-                Path='/elasticbeanstalk/',
-                ServerCertificateName=certificate_name + '.new',
-                CertificateBody=certificate_body,
-                PrivateKey=certificate_private_key,
-                CertificateChain=certificate_chain
-            )
-        certificate_arn = response['ServerCertificateMetadata'][
-            'Arn']
-        LOGGER.info('Use certificate {}'.format(
-            response['ServerCertificateMetadata']['ServerCertificateName']))
-        LOGGER.info('IAM certificate id `{}`'.format(certificate_arn))
-        return certificate_arn
+            certificate_arn = response['ServerCertificateMetadata'][
+                'Arn']
+            LOGGER.info('Use certificate {}'.format(
+                response['ServerCertificateMetadata']['ServerCertificateName']))
+            LOGGER.info('IAM certificate id `{}`'.format(certificate_arn))
+            return certificate_arn
+
+    def get_certificate(self, certificate_name):
+        """
+
+        :param certificate_name:
+        :return:
+        """
+        iam = boto3.client('iam', **self.client.settings)
+        response = iam.get_server_certificate(
+            ServerCertificateName=certificate_name
+        )
+        return response['ServerCertificate']['ServerCertificateMetadata']['Arn']
 
     def __create_applications(self, application_name):
         if not self.client.instance.describe_applications(
@@ -231,7 +230,7 @@ class EBDeployer(object):
                      OptionName="SSLCertificateId",
                      Value=certificate_arn))
             option_settings.append(
-                dict(Namespace="aws:elb:healthcheck" ,
+                dict(Namespace="aws:elb:healthcheck",
                      OptionName="Target",
                      ResourceName="AWSEBLoadBalancer",
                      Value=app_config.get('health', '/')))
