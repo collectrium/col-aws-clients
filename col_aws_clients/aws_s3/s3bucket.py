@@ -46,7 +46,7 @@ class S3Bucket(object):
         :type str
         :return:
         """
-        return self.client.instance.list_objects(
+        return self.client.instance.list_objects_v2(
             Bucket=self.bucket_name, Prefix=prefix
         )
 
