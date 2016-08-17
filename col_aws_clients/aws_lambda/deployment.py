@@ -351,8 +351,7 @@ class LambdaDeployer(object):
                 s3.instance.put_bucket_notification_configuration(
                     Bucket=bucket_name,
                     NotificationConfiguration={
-                        'LambdaFunctionConfigurations': [
-                            function_configurations]
+                        'LambdaFunctionConfigurations': function_configurations
                     }
                 )
             except ClientError:
