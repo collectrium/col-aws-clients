@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import distutils
+import hashlib
 import logging
 import os
 import shutil
@@ -276,14 +277,14 @@ class LambdaDeployer(object):
                 client.put_targets(
                     Rule=function_name,
                     Targets=[
-                        {'Id': 'b5b5e45d-87ad-491f-82f9-e387dd4bc247',
+                        {'Id': hashlib.sha256(function_name).hexdigest(),
                          'Arn': self.arns[function_name]
                          }
                     ]
                 )
                 permission = dict(
                     FunctionName=function_name,
-                    StatementId='b5b5e45d-87ad-491f-82f9-e387dd4bc247',
+                    StatementId=hashlib.sha256(function_name).hexdigest(),
                     Action="lambda:InvokeFunction",
                     Principal="events.amazonaws.com",
                     SourceArn=response['RuleArn'],

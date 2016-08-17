@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import hashlib
 import logging
 
 import boto3
@@ -207,8 +208,8 @@ class LambdaClient(BaseAWSClient):
         """
         LOGGER.info('Add API Gateway permission `%s`', function_name)
         permission = dict(
-            FunctionName=function_name + ':development',
-            StatementId="58f7cfba-2278-4583-baae-227c582c2023",
+            FunctionName=function_name,
+            StatementId=hashlib.sha256(function_name).hexdigest(),
             Action="lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",
         )
@@ -223,7 +224,7 @@ class LambdaClient(BaseAWSClient):
         LOGGER.info('Add S3 permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,
-            StatementId='275fcfb4-9220-4f69-a069-915e258d11a0',
+            StatementId=hashlib.sha256(function_name + bucket_name).hexdigest(),
             Action="lambda:InvokeFunction",
             Principal="s3.amazonaws.com",
             SourceArn="arn:aws:s3:::{}".format(bucket_name),
@@ -238,7 +239,7 @@ class LambdaClient(BaseAWSClient):
         LOGGER.info('Add SNS permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,
-            StatementId='8d1f26ba-d229-447e-9c38-b496c624146b',
+            StatementId=hashlib.sha256(function_name).hexdigest(),
             Action="lambda:InvokeFunction",
             Principal="sns.amazonaws.com",
         )
