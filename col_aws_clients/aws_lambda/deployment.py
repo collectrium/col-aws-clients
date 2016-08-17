@@ -314,42 +314,46 @@ class LambdaDeployer(object):
 
     def _add_triggers(self):
         s3 = None
+        notifications_specs = {}
         for function_name, function_config in self.lambda_config.items():
             event_sources = function_config.get('event_sources', None)
-            try:
-                if event_sources and 's3' in event_sources:
-                    s3 = s3 or S3Client(
-                        region_name=self.client.settings['region_name'],
-                        aws_access_key_id=self.client.settings[
-                            'aws_access_key_id'],
-                        aws_secret_access_key=self.client.settings[
-                            'aws_secret_access_key'
-                        ],
+            if event_sources and 's3' in event_sources:
+                s3 = s3 or S3Client(
+                    region_name=self.client.settings['region_name'],
+                    aws_access_key_id=self.client.settings[
+                        'aws_access_key_id'],
+                    aws_secret_access_key=self.client.settings[
+                        'aws_secret_access_key'
+                    ],
 
-                    )
-                    notification_spec = {
-                        'LambdaFunctionConfigurations': [
-                            {
-                                'Events': ['s3:ObjectCreated:*', ],
-                                'LambdaFunctionArn': self.arns[function_name],
-                                'Filter': {
-                                    'Key': {
-                                        'FilterRules': [
-                                            {
-                                                'Name': 'prefix',
-                                                'Value': event_sources['s3'][
-                                                    'prefix']
-                                            },
-                                        ]
-                                    }
-                                }
+                )
+                notifications_specs.setdefault(
+                    event_sources['s3']['bucket_name'], []).append(
+                    {
+                        'Events': ['s3:ObjectCreated:*', ],
+                        'LambdaFunctionArn': self.arns[function_name],
+                        'Filter': {
+                            'Key': {
+                                'FilterRules': [
+                                    {
+                                        'Name': 'prefix',
+                                        'Value': event_sources['s3'][
+                                            'prefix']
+                                    },
+                                ]
                             }
-                        ],
+                        }
                     }
+                )
 
-                    s3.instance.put_bucket_notification_configuration(
-                        Bucket=event_sources['s3']['bucket_name'],
-                        NotificationConfiguration=notification_spec
-                    )
+        for bucket_name, function_configurations in notifications_specs.items():
+            try:
+                s3.instance.put_bucket_notification_configuration(
+                    Bucket=bucket_name,
+                    NotificationConfiguration={
+                        'LambdaFunctionConfigurations': [
+                            function_configurations]
+                    }
+                )
             except ClientError:
                 pass
