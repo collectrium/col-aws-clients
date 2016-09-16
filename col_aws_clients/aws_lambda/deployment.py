@@ -115,8 +115,8 @@ class LambdaPackage(object):
                                for path in os.listdir(lib_dir)]
                     for module in modules:
                         for shared_object in (
-                                lib for libs in requirements.values() for lib in
-                                libs
+                                lib for libs
+                                in requirements.values() for lib in libs
                         ):
                             if shared_object in module:
                                 so_files.append(os.path.join(lib_dir, module))
@@ -306,7 +306,9 @@ class LambdaDeployer(object):
                     )
 
                 elif event_sources and 'api_gateway' in event_sources:
-                    self.client.add_api_gateway_invoke_permission(function_name)
+                    self.client.add_api_gateway_invoke_permission(
+                        function_name
+                    )
                 elif event_sources and 'sns' in event_sources:
                     self.client.add_sns_invoke_permission(function_name)
             except ClientError:
@@ -346,12 +348,12 @@ class LambdaDeployer(object):
                     }
                 )
 
-        for bucket_name, function_configurations in notifications_specs.items():
+        for bucket_name, configurations in notifications_specs.items():
             try:
                 s3.instance.put_bucket_notification_configuration(
                     Bucket=bucket_name,
                     NotificationConfiguration={
-                        'LambdaFunctionConfigurations': function_configurations
+                        'LambdaFunctionConfigurations': configurations
                     }
                 )
             except ClientError:

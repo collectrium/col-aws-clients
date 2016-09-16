@@ -71,7 +71,9 @@ class APIGatewayClient(BaseAWSClient):
                 body=json.dumps(swagger_json)
             )
 
-    def deploy_stage(self, api_name, stage, lambda_function_name, version=None):
+    def deploy_stage(
+            self, api_name, stage, lambda_function_name, version=None
+    ):
         """
         Deploy stage
         :param api_name: API Gateway visible name
