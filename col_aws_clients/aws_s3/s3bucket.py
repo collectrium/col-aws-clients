@@ -242,7 +242,8 @@ class S3Bucket(object):
         """
         self.client.instance.delete_object(Bucket=self.bucket_name, Key=key)
 
-    def reduce_url(self, url):
+    @staticmethod
+    def reduce_url(url):
         """
         Get path to object on bucket from presigned url
         :param url: presigned url
