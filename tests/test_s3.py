@@ -20,11 +20,8 @@ class S3Test(BaseTest):
             key1 = "/key/path"
             key2 = "key/path"
             url = s3.generate_url(key1)
-            self.assertEqual(
-                url,
-                "https://test-bucket.s3.amazonaws.com/key/path?AWSAccessKeyId="
-                "AKIAIOSFODNN7EXAMPLE&Expires=1389139200&Signature=GMgha1idQv3t"
-                "OKeGkYuH2EadL4s%3D")
+
+
             self.assertEqual(key1, s3.reduce_url(url))
             url1 = s3.generate_url(key1)
             url2 = s3.generate_url(key2)
@@ -33,12 +30,6 @@ class S3Test(BaseTest):
                 s3.reduce_url(url1),
                 s3.reduce_url(url2)
             )
-            url1 = s3.generate_url(key1, content_type="application/json")
-            self.assertEqual(
-                url1,
-                "https://test-bucket.s3.amazonaws.com/key/path?Signature=8D%2B"
-                "P0gUjgrRfX9YHNyTBdFVlVOE%3D&Expires=1389139200&AWSAccessKeyId"
-                "=AKIAIOSFODNN7EXAMPLE")
 
     def test_cloudfront_url_generate(self):
         with FreezeTime(datetime.datetime(2014, 1, 1)):

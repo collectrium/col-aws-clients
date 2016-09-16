@@ -224,7 +224,9 @@ class LambdaClient(BaseAWSClient):
         LOGGER.info('Add S3 permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,
-            StatementId=hashlib.sha256(function_name + bucket_name).hexdigest(),
+            StatementId=hashlib.sha256(
+                function_name + bucket_name
+            ).hexdigest(),
             Action="lambda:InvokeFunction",
             Principal="s3.amazonaws.com",
             SourceArn="arn:aws:s3:::{}".format(bucket_name),

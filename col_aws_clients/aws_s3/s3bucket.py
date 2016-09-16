@@ -1,9 +1,7 @@
 from __future__ import unicode_literals
 
-import urllib
-import urlparse
 from datetime import datetime, timedelta
-
+import urlparse
 import boto
 import boto3
 import rsa
@@ -256,7 +254,7 @@ class S3Bucket(object):
         if not upr.scheme:
             path = url
         else:
-            path = urllib.unquote(upr.path.encode('utf-8'))
+            path = urlparse.unquote(upr.path.encode('utf-8'))
         return path
 
     def make_public(self, key):

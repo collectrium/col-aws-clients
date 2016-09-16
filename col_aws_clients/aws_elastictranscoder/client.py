@@ -223,5 +223,5 @@ class ElasticTranscoderClient(BaseAWSClient):
             size_transcoded=response.get(
                 'Output', {}
             ).get('FileSize'),
-            aspect_ratio =response.get('Input', {}).get('AspectRatio')
+            aspect_ratio=response.get('Input', {}).get('AspectRatio')
         )

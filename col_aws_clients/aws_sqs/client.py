@@ -27,20 +27,21 @@ class SQSClient(BaseAWSClient):
             aws_secret_access_key=aws_secret_access_key,
         )
 
-    def create_queue(self,
-                     queue_name,
-                     retention_time=345600,
-                     visibility_timeout=300,
-                     delay_seconds=0,
-                     dead_letter_queue=None,
-                     max_receive_count=None
-                    ):
+    def create_queue(
+            self,
+            queue_name,
+            retention_time=345600,
+            visibility_timeout=300,
+            delay_seconds=0,
+            dead_letter_queue=None,
+            max_receive_count=None
+    ):
         """
         :param queue_name: name of SQS queue
         :type str
         :param retention_time: life time for sqs task in  queue
         :type int
-        :param visibility_timeout: time of lock for reading from another clients
+        :param visibility_timeout: time of lock for  another clients
         :type int
         :param delay_seconds: delay before new task stay visible in queue
         :type int

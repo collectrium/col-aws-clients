@@ -84,8 +84,8 @@ class EBDeployer(object):
         Sample config:
         {
             'eb_reindex_worker': {
-                'type': 'worker',
-                'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
+               'type': 'worker',
+               'stack': '64bit Amazon Linux 2015.09 v2.0.8 running Python 2.7',
 
             }
         }
@@ -101,7 +101,9 @@ class EBDeployer(object):
             aws_secret_access_key
         )
         self.version = str(uuid.uuid4())
-        bucket_name = self.client.instance.create_storage_location()['S3Bucket']
+        bucket_name = self.client.instance.create_storage_location()[
+            'S3Bucket'
+        ]
         self.bucket = S3Bucket(
             bucket_name,
             region_name,
@@ -134,15 +136,17 @@ class EBDeployer(object):
             dict(OptionName="MinSize",
                  ResourceName="AWSEBAutoScalingGroup",
                  Namespace="aws:autoscaling:asg",
-                 Value=
-                 str(app_config.get('instances_autoscaling_range',
-                                    (1, 4))[0])),
+                 Value=str(
+                     app_config.get('instances_autoscaling_range', (1, 4))[0]
+                    )
+                 ),
             dict(OptionName="MaxSize",
                  ResourceName="AWSEBAutoScalingGroup",
                  Namespace="aws:autoscaling:asg",
-                 Value=
-                 str(app_config.get('instances_autoscaling_range',
-                                    (1, 4))[1])),
+                 Value=str(
+                     app_config.get('instances_autoscaling_range', (1, 4))[1]
+                    )
+                 ),
             dict(OptionName="InstanceType",
                  Namespace="aws:autoscaling:launchconfiguration",
                  Value=app_config.get('instance_type', 't2.micro')),
