@@ -4,6 +4,7 @@ import boto3
 
 LOGGER = logging.getLogger(__name__)
 
+
 class BaseAWSClientException(Exception):
     """
     Base AWS CLient Exception
@@ -21,7 +22,7 @@ class BaseAWSClient(object):
                  aws_access_key_id,
                  aws_secret_access_key,
                  **kwargs
-                ):
+                 ):
         """
 
         :param service: AWS service ('ec2','es' etc.)

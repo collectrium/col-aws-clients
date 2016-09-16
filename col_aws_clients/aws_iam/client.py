@@ -72,4 +72,6 @@ class IAMClient(BaseAWSClient):
         response = self.instance.get_server_certificate(
             ServerCertificateName=certificate_name
         )
-        return response['ServerCertificate']['ServerCertificateMetadata']['Arn']
+        return response[
+            'ServerCertificate'
+        ]['ServerCertificateMetadata']['Arn']
