@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import urllib
-import urlparse
+from six.moves.urllib import urlparse
 from datetime import datetime, timedelta
 
 import boto
