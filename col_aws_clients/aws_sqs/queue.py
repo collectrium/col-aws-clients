@@ -60,25 +60,26 @@ class SQSQueue(object):
             **kwargs
         )
 
-    def send_messages(self, message):
+    def send_messages(self, message, delay_timeout=None):
         """
         Send messages to SQS
         :param message: one or list of messages string
+        :param delay_timeout
         :return:
         """
         if not isinstance(message, list):
             message = [message, ]
-        self.instance.send_messages(
-            Entries=[
-                dict(
-                    MessageBody=json.dumps(msg) if not isinstance(
-                        message, basestring) else msg,
-                    Id=str(idx)
+        entries = [
+            dict(
+                MessageBody=json.dumps(msg) if not isinstance(
+                    message, basestring) else msg,
+                Id=str(idx),
 
-                ) for idx, msg in enumerate(message)
+            ) for idx, msg in enumerate(message)]
 
-                ]
-        )
+        if delay_timeout:
+            [entry.update(DelaySeconds=delay_timeout) for entry in entries]
+        self.instance.send_messages(Entries=entries)
 
     def delete_messages(self, receipt_handles):
         """
