@@ -12,13 +12,21 @@ class SQSQueue(object):
                  region_name,
                  aws_access_key_id,
                  aws_secret_access_key,
-                 auto_creation=False):
+                 auto_creation=False,
+                 endpoint_url=''
+                 ):
         """
         :param queue_name:
         """
-        self.client = SQSClient(region_name,
-                                aws_access_key_id,
-                                aws_secret_access_key)
+        settings = {'region_name': region_name,
+                    'aws_access_key_id': aws_access_key_id,
+                    'aws_secret_access_key': aws_secret_access_key,
+                    }
+        if endpoint_url:
+            settings.update(
+                endpoint_url=endpoint_url
+            )
+        self.client = SQSClient(**settings)
         self.queue_url = self.client.get_queue_url(queue_name)
         if not self.queue_url and auto_creation:
             self.client.create_queue(queue_name)
