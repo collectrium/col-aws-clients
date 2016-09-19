@@ -13,18 +13,27 @@ class SQSClient(BaseAWSClient):
     def __init__(self,
                  region_name,
                  aws_access_key_id,
-                 aws_secret_access_key):
+                 aws_secret_access_key,
+                 endpoint_url=None
+                 ):
         """
         :param region_name: AWS region name
         :param aws_access_key_id:  AWS credentials
         :param aws_secret_access_key: AWS credentials
         """
         self.__urls = {}
-        super(SQSClient, self).__init__(
+        settings = dict(
             service='sqs',
             region_name=region_name,
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
+        )
+        if endpoint_url:
+            settings.update(
+                endpoint_url=endpoint_url
+            )
+        super(SQSClient, self).__init__(
+            **settings
         )
 
     def create_queue(

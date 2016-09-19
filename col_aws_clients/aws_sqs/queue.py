@@ -13,7 +13,7 @@ class SQSQueue(object):
                  aws_access_key_id,
                  aws_secret_access_key,
                  auto_creation=False,
-                 endpoint_url=''
+                 endpoint_url=None
                  ):
         """
         :param queue_name:
