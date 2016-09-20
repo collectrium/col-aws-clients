@@ -11,6 +11,18 @@ from botocore.signers import CloudFrontSigner
 from ..aws_s3.client import S3Client
 
 
+
+def ensure_unicode(obj):
+    if isinstance(obj, str):
+        return obj.decode('utf-8')
+    elif isinstance(obj, dict):
+        return {k: ensure_unicode(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [ensure_unicode(item) for item in obj]
+    else:
+        return obj
+
+
 class S3Bucket(object):
     """
     Implements interface to S3 bucket resource
@@ -97,8 +109,12 @@ class S3Bucket(object):
         :return: url
         :rtype str
         """
+
+
         if key is None:
             return
+
+        key = ensure_unicode(key)
 
         if not content_type:
             key = key.lstrip('/')
@@ -144,6 +160,8 @@ class S3Bucket(object):
         """
         if key is None:
             return
+
+        key = ensure_unicode(key)
 
         key = key.lstrip('/')
 
