@@ -28,11 +28,15 @@ class IAMClient(BaseAWSClient):
 
     def upload_certificate(self,
                            certificate_name,
+                           certificate_path,
                            certificate_body,
                            certificate_private_key,
                            certificate_chain):
         """
-
+        :param certificate_name: Name for certificate
+        :type str
+        :param certificate_path: Upload path
+        :type str
         :param certificate_body: SSL certificate
         :type str
         :param certificate_private_key: SSL private key
@@ -52,7 +56,7 @@ class IAMClient(BaseAWSClient):
 
         try:
             response = self.instance.upload_server_certificate(
-                Path='/elasticbeanstalk/',
+                Path='/{}/{}/'.format(certificate_path, certificate_name),
                 ServerCertificateName=certificate_name,
                 CertificateBody=certificate_body,
                 PrivateKey=certificate_private_key,
