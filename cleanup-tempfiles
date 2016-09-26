@@ -1,0 +1,16 @@
+#!/bin/bash
+
+d="${1}"
+
+if [[ -z ${d} ]]; then
+    d="`pwd`"
+fi
+
+echo "Cleaning up *.pyc files ..."
+find "${d}" -name '*.pyc' -exec rm -rf '{}' \;
+
+echo "Cleaning up *~ files ..."
+find "${d}" -name '*~' -exec rm -rf '{}' \;
+
+echo "Cleaning up *.orig files ..."
+find "${d}" -name '*.orig' -exec rm -rf '{}' \;
