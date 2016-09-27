@@ -30,6 +30,7 @@ setup(
     author_email='support@collectrium.com',
     packages=packages,
     install_requires=reqs,
+    license = "LGPL",
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
     version='0.3',
     description='Collectrium AWS clients',
