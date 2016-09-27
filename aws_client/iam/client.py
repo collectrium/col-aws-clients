@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from botocore.exceptions import ClientError
 
-from ..aws_client import BaseAWSClient
+from ..base_client import BaseAWSClient
 
 
 class IAMClient(BaseAWSClient):

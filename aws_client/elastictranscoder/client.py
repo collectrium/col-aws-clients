@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import boto3
 
-from aws_clients.aws_sns.client import SNSClient
-from ..aws_client import BaseAWSClient
+from aws_client.aws_sns.client import SNSClient
+from ..base_client import BaseAWSClient
 
 
 class ElasticTranscoderClient(BaseAWSClient):

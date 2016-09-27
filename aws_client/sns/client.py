@@ -1,7 +1,7 @@
 import json
 
-from aws_clients.lambda_.client import LambdaClient
-from ..aws_client import BaseAWSClient
+from aws_client.aws_lambda.client import LambdaClient
+from ..base_client import BaseAWSClient
 
 
 class SNSClient(BaseAWSClient):
@@ -62,16 +62,16 @@ class SNSClient(BaseAWSClient):
 
     def subscribe_to_lambda(self, topic_name, function_name):
         """
-        Subscribe AWS lambda_ to topic
+        Subscribe AWS aws_lambda to topic
         :param topic_name: SNS topic name
         :type str
-        :param function_name: lambda_ function name
+        :param function_name: aws_lambda function name
         :type str
         :return:
         """
         lambda_client = LambdaClient(**self.settings)
         self.instance.subscribe(
             TopicArn=self.get_topic_arn(topic_name),
-            Protocol='lambda_',
+            Protocol='aws_lambda',
             Endpoint=lambda_client.get_function_arn(function_name)
         )

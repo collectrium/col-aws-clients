@@ -5,7 +5,7 @@ from cStringIO import StringIO
 
 from mock import patch
 
-from aws_clients.api_gateway.deployment import APIGatewayDeployer
+from aws_client.api_gateway.deployment import APIGatewayDeployer
 from tests.base_test import BaseTest
 from tests.mock_aws_api import AWSMock
 
@@ -42,7 +42,7 @@ class AGTest(BaseTest):
                                 "statusCode": "200"
                             }
                         },
-                        "uri": "arn:aws:apigateway:us-east-1:lambda_:path/2015-03-31/functions/arn:aws:lambda_:us-east-1:21423412341234:function:${stageVariables.lambda_function}/invocations",
+                        "uri": "arn:aws:apigateway:us-east-1:aws_lambda:path/2015-03-31/functions/arn:aws:aws_lambda:us-east-1:21423412341234:function:${stageVariables.lambda_function}/invocations",
                         "passthroughBehavior": "when_no_match",
                         "httpMethod": "POST",
                         "type": "aws"

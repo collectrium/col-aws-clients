@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from ..aws_client import BaseAWSClient
+from ..base_client import BaseAWSClient
 
 
-class ElasticsearchServiceClient(BaseAWSClient):
+class ElasticBeanstalkClient(BaseAWSClient):
     """
      AWS Elasticsearch  Service client
     """
@@ -13,12 +13,15 @@ class ElasticsearchServiceClient(BaseAWSClient):
                  aws_access_key_id,
                  aws_secret_access_key):
         """
-        :param region_name: AWS region name
+        :param region_name:  AWS region name
+        :type str
         :param aws_access_key_id: AWS credentials
+        :type str
         :param aws_secret_access_key: AWS credentials
+        :type str
         """
-        super(ElasticsearchServiceClient, self).__init__(
-            service='es',
+        super(ElasticBeanstalkClient, self).__init__(
+            service='elasticbeanstalk',
             region_name=region_name,
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,

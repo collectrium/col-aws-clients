@@ -8,7 +8,7 @@ if __name__ == '__main__':
         # nose.main()
         nose.run(argv=[os.path.abspath(__file__),
                             "--with-coverage",
-                       "--cover-package=aws_clients",
+                       "--cover-package=aws_client",
                        "--cover-erase",
                        ])
     finally:

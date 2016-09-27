@@ -7,7 +7,7 @@ import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
 
-from ..aws_client import BaseAWSClient
+from ..base_client import BaseAWSClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -210,7 +210,7 @@ class LambdaClient(BaseAWSClient):
         permission = dict(
             FunctionName=function_name,
             StatementId=hashlib.sha256(function_name).hexdigest(),
-            Action="lambda_:InvokeFunction",
+            Action="aws_lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",
         )
         self.instance.add_permission(**permission)
@@ -227,7 +227,7 @@ class LambdaClient(BaseAWSClient):
             StatementId=hashlib.sha256(
                 function_name + bucket_name
             ).hexdigest(),
-            Action="lambda_:InvokeFunction",
+            Action="aws_lambda:InvokeFunction",
             Principal="s3.amazonaws.com",
             SourceArn="arn:aws:s3:::{}".format(bucket_name),
         )
@@ -242,7 +242,7 @@ class LambdaClient(BaseAWSClient):
         permission = dict(
             FunctionName=function_name,
             StatementId=hashlib.sha256(function_name).hexdigest(),
-            Action="lambda_:InvokeFunction",
+            Action="aws_lambda:InvokeFunction",
             Principal="sns.amazonaws.com",
         )
         self.instance.add_permission(**permission)

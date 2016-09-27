@@ -4,7 +4,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from ..aws_client import BaseAWSClient
+from ..base_client import BaseAWSClient
 
 LOGGER = logging.getLogger(__name__)
 

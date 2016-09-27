@@ -15,7 +15,7 @@ import boto3
 from botocore.exceptions import ClientError
 from git import Repo
 
-from ..lambda_.client import LambdaClient
+from ..aws_lambda.client import LambdaClient
 from ..s3.client import S3Client
 
 LIB_DIRS = (
@@ -37,10 +37,10 @@ class LambdaPackage(object):
         """
 
         :param aws_lambda_config:
-         Sample lambda_ config:
+         Sample aws_lambda config:
 
         [  'function_1': {  # function name
-                 'role_name':'lambda_basic_execution', # IAM role for lambda_
+                 'role_name':'lambda_basic_execution', # IAM role for aws_lambda
                  'handler': 'lambda_module.function_1',  # handler
                  'shedule_expression': "rate(5 minutes)", # set for periodic
                  'event_sources':{
@@ -66,7 +66,7 @@ class LambdaPackage(object):
             ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
-        self.zip_file = os.path.join(self.workspace, 'lambda_.zip')
+        self.zip_file = os.path.join(self.workspace, 'aws_lambda.zip')
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.requirements = (aws_lambda_config.pop('binary_requirements')
@@ -198,10 +198,10 @@ class LambdaDeployer(object):
     ):
         """
         :param aws_lambda_config:
-        Sample lambda_ config:
+        Sample aws_lambda config:
 
         [  'function_1': {  # function name
-                 'role_name':'lambda_basic_execution', # IAM role for lambda_
+                 'role_name':'lambda_basic_execution', # IAM role for aws_lambda
                  'handler': 'lambda_module.function_1',  # handler
                  'shedule_expression': "rate(5 minutes)", # set for periodic
                  'event_sources':{
@@ -285,7 +285,7 @@ class LambdaDeployer(object):
                 permission = dict(
                     FunctionName=function_name,
                     StatementId=hashlib.sha256(function_name).hexdigest(),
-                    Action="lambda_:InvokeFunction",
+                    Action="aws_lambda:InvokeFunction",
                     Principal="events.amazonaws.com",
                     SourceArn=response['RuleArn'],
                 )
