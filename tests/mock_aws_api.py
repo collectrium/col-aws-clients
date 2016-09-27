@@ -129,7 +129,7 @@ class AWSMock(object):
         elif operation_name == 'Invoke':
             return {'Payload': StringIO('test_result')}
         elif operation_name == 'CreateFunction':
-            function_arn = 'arn:aws:lambda:{region_name}:{account_id}:function' \
+            function_arn = 'arn:aws:lambda_:{region_name}:{account_id}:function' \
                            ':{function_name}'.format(
                 region_name=BaseTest.region_name,
                 account_id=BaseTest.account_id,
@@ -161,7 +161,7 @@ class AWSMock(object):
                     Error=dict(
                         ErrorMessage='An error occurred (Res   ourceNotFoundException) '
                                      'when calling the UpdateFunctionCode operation: '
-                                     'Function not found: arn:aws:lambda:'
+                                     'Function not found: arn:aws:lambda_:'
                                      '{region_name}:{account_id}:function:{function_name}'.format(
                             region_name=BaseTest.region_name,
                             account_id=BaseTest.account_id,
@@ -192,7 +192,7 @@ class AWSMock(object):
                     Error=dict(
                         ErrorMessage='An error occurred (ResourceNotFoundException) '
                                      'when calling the PublishVersion operation: '
-                                     'Function not found: arn:aws:lambda:'
+                                     'Function not found: arn:aws:lambda_:'
                                      '{region_name}:{account_id}:function:{function_name}'.format(
                             region_name=BaseTest.region_name,
                             account_id=BaseTest.account_id,
@@ -224,7 +224,7 @@ class AWSMock(object):
                     Error=dict(
                         ErrorMessage='An error occurred (ResourceNotFoundException) '
                                      'when calling the CreateAlias operation: '
-                                     'Function not found: arn:aws:lambda:'
+                                     'Function not found: arn:aws:lambda_:'
                                      '{region_name}:{account_id}:function:{function_name}'.format(
                             region_name=BaseTest.region_name,
                             account_id=BaseTest.account_id,

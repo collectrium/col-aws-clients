@@ -8,7 +8,7 @@ import rsa
 from botocore.exceptions import ClientError
 from botocore.signers import CloudFrontSigner
 
-from ..aws_s3.client import S3Client
+from ..s3.client import S3Client
 
 
 

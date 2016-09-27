@@ -25,7 +25,7 @@ packages = find_packages(
 )
 
 setup(
-    name='col_aws_clients',
+    name='aws_clients',
     author='collectrium',
     author_email='support@collectrium.com',
     packages=packages,

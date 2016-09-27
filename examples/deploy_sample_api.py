@@ -6,13 +6,13 @@ import zipfile
 # logger = logging.getLogger('AWSClients')
 # fh = logging.FileHandler('deploy.log')
 # logger.addHandler(fh)
-from col_aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
-from col_aws_clients.aws_lambda.deployment import LambdaDeployer
+from aws_clients.api_gateway.deployment import APIGatewayDeployer
+from aws_clients.lambda_.deployment import LambdaDeployer
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def debug_deploy(aws_access_key_id, aws_secret_access_key):
-    zip_file = zipfile.ZipFile('lambda.zip', "w", zipfile.ZIP_DEFLATED)
+    zip_file = zipfile.ZipFile('lambda_.zip', "w", zipfile.ZIP_DEFLATED)
     zip_file.write('examples/lambda_module.py', 'lambda_module.py')
     zip_file.close()
 
@@ -20,7 +20,7 @@ def debug_deploy(aws_access_key_id, aws_secret_access_key):
         region_name='us-east-1',
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
-        zip_file='lambda.zip',
+        zip_file='lambda_.zip',
         version='development',
         aws_lambda_config={
             'roma_api_function': {

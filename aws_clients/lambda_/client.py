@@ -210,7 +210,7 @@ class LambdaClient(BaseAWSClient):
         permission = dict(
             FunctionName=function_name,
             StatementId=hashlib.sha256(function_name).hexdigest(),
-            Action="lambda:InvokeFunction",
+            Action="lambda_:InvokeFunction",
             Principal="apigateway.amazonaws.com",
         )
         self.instance.add_permission(**permission)
@@ -227,7 +227,7 @@ class LambdaClient(BaseAWSClient):
             StatementId=hashlib.sha256(
                 function_name + bucket_name
             ).hexdigest(),
-            Action="lambda:InvokeFunction",
+            Action="lambda_:InvokeFunction",
             Principal="s3.amazonaws.com",
             SourceArn="arn:aws:s3:::{}".format(bucket_name),
         )
@@ -242,7 +242,7 @@ class LambdaClient(BaseAWSClient):
         permission = dict(
             FunctionName=function_name,
             StatementId=hashlib.sha256(function_name).hexdigest(),
-            Action="lambda:InvokeFunction",
+            Action="lambda_:InvokeFunction",
             Principal="sns.amazonaws.com",
         )
         self.instance.add_permission(**permission)
