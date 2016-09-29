@@ -29,8 +29,8 @@ class EBPackage(object):
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.version = version
-        self.workspace = tempfile.gettempdir() + (''.join(choice(
-            ascii_lowercase) for _ in range(10)))
+        self.workspace = os.path.join(tempfile.gettempdir(), (''.join(choice(
+            ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(
@@ -138,14 +138,14 @@ class EBDeployer(object):
                  Namespace="aws:autoscaling:asg",
                  Value=str(
                      app_config.get('instances_autoscaling_range', (1, 4))[0]
-                    )
+                 )
                  ),
             dict(OptionName="MaxSize",
                  ResourceName="AWSEBAutoScalingGroup",
                  Namespace="aws:autoscaling:asg",
                  Value=str(
                      app_config.get('instances_autoscaling_range', (1, 4))[1]
-                    )
+                 )
                  ),
             dict(OptionName="InstanceType",
                  Namespace="aws:autoscaling:launchconfiguration",
