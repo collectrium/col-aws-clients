@@ -26,3 +26,15 @@ class ElasticBeanstalkClient(BaseAWSClient):
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
         )
+
+    def get_environment_state(self, app_name, env_name):
+        response = self.instance.describe_environments(
+            ApplicationName=app_name,
+            EnvironmentNames=[
+                env_name,
+            ],
+        )
+        return (
+            response['Environments'][0]['Status'],
+            response['Environments'][0]['Health']
+        )
