@@ -8,6 +8,7 @@ import uuid
 import zipfile
 from random import choice
 from string import ascii_lowercase
+from time import strftime
 
 from git import Repo
 
@@ -100,7 +101,7 @@ class EBDeployer(object):
             aws_access_key_id,
             aws_secret_access_key
         )
-        self.version = str(uuid.uuid4())
+        self.version = strftime("%Y%m%d%H%M%S")
         bucket_name = self.client.instance.create_storage_location()[
             'S3Bucket'
         ]
