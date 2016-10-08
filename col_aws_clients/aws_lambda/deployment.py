@@ -66,7 +66,7 @@ class LambdaPackage(object):
             ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
-        self.zip_file = os.path.join(self.workspace, 'lambda.zip')
+        self.zip_file = os.path.join(tempfile.gettempdir(), 'lambda.zip')
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.requirements = (aws_lambda_config.pop('binary_requirements')
