@@ -31,7 +31,7 @@ setup(
     packages=packages,
     install_requires=reqs,
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
-    version='0.1',
+    version='0.4',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
     # use the URL to the github repo
