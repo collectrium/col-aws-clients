@@ -32,7 +32,7 @@ setup(
     install_requires=reqs,
     license = "LGPL",
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
-    version='0.4',
+    version='0.5',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
     # use the URL to the github repo
