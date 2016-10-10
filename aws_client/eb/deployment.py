@@ -8,6 +8,7 @@ import uuid
 import zipfile
 from random import choice
 from string import ascii_lowercase
+from time import strftime
 
 from git import Repo
 
@@ -29,8 +30,8 @@ class EBPackage(object):
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.version = version
-        self.workspace = tempfile.gettempdir() + (''.join(choice(
-            ascii_lowercase) for _ in range(10)))
+        self.workspace = os.path.join(tempfile.gettempdir(), (''.join(choice(
+            ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
         self.zip_file = os.path.join(
@@ -100,7 +101,7 @@ class EBDeployer(object):
             aws_access_key_id,
             aws_secret_access_key
         )
-        self.version = str(uuid.uuid4())
+        self.version = strftime("%Y%m%d%H%M%S")
         bucket_name = self.client.instance.create_storage_location()[
             'S3Bucket'
         ]
@@ -138,14 +139,14 @@ class EBDeployer(object):
                  Namespace="aws:autoscaling:asg",
                  Value=str(
                      app_config.get('instances_autoscaling_range', (1, 4))[0]
-                    )
+                 )
                  ),
             dict(OptionName="MaxSize",
                  ResourceName="AWSEBAutoScalingGroup",
                  Namespace="aws:autoscaling:asg",
                  Value=str(
                      app_config.get('instances_autoscaling_range', (1, 4))[1]
-                    )
+                 )
                  ),
             dict(OptionName="InstanceType",
                  Namespace="aws:autoscaling:launchconfiguration",

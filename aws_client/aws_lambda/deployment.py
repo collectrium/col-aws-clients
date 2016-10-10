@@ -66,7 +66,7 @@ class LambdaPackage(object):
             ascii_lowercase) for _ in range(10))))
 
         LOGGER.info('Create workspace `{}`'.format(self.workspace))
-        self.zip_file = os.path.join(self.workspace, 'aws_lambda.zip')
+        self.zip_file = os.path.join(tempfile.gettempdir(), 'lambda.zip')
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
         self.requirements = (aws_lambda_config.pop('binary_requirements')
@@ -285,7 +285,7 @@ class LambdaDeployer(object):
                 permission = dict(
                     FunctionName=function_name,
                     StatementId=hashlib.sha256(function_name).hexdigest(),
-                    Action="aws_lambda:InvokeFunction",
+                    Action="lambda:InvokeFunction",
                     Principal="events.amazonaws.com",
                     SourceArn=response['RuleArn'],
                 )

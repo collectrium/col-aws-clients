@@ -53,7 +53,7 @@ class IAMClient(BaseAWSClient):
             )
         except ClientError:
             pass
-
+        response = None
         try:
             response = self.instance.upload_server_certificate(
                 Path='/{}/{}/'.format(certificate_path, certificate_name),
@@ -63,8 +63,9 @@ class IAMClient(BaseAWSClient):
                 CertificateChain=certificate_chain
             )
         except ClientError:
-            certificate_arn = response['ServerCertificateMetadata'][
-                'Arn']
+            certificate_arn = response and \
+                              response['ServerCertificateMetadata'][
+                                  'Arn']
             return certificate_arn
 
     def get_certificate_arn(self, certificate_name):
