@@ -103,6 +103,8 @@ celery-beat*
 celery
 .settings
 env
+env2
+env3
 environment.py
 
 celerybeat-schedule
