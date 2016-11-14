@@ -96,12 +96,14 @@ class S3Bucket(object):
         self.client.instance.copy_object(**kwargs)
 
     def generate_url(self, key,
-                     url_expiration_time=604800,  # 60*60*24*7s
+                     url_expiration_time=60 * 60 * 24 * 90,
                      force_http_url=False,
                      content_type=None,
                      ):
         """
         Generate presigned url for object on bucket
+        :param url_expiration_time: time until url expires in seconds
+        :type url_expiration_time: int
         :param key:  path to object on bucket
         :type str
         :param content_type: content-type for object
@@ -147,11 +149,13 @@ class S3Bucket(object):
                                 cloudfront_domain,
                                 cloudfront_key_id,
                                 cloudfront_private_key,
-                                url_expiration_time=604800,  # 60*60*24*7s
+                                url_expiration_time=60 * 60 * 24 * 90,
                                 force_http_url=False
                                 ):
         """
         Generate presigned url for object on bucket
+        :param url_expiration_time: time until url expires in seconds
+        :type url_expiration_time: int
         :param key:  path to object on bucket
         :param cloudfront:  return url to cloudfront instead of s3
         :type str
