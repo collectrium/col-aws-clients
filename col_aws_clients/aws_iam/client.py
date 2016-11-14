@@ -34,15 +34,15 @@ class IAMClient(BaseAWSClient):
                            certificate_chain):
         """
         :param certificate_name: Name for certificate
-        :type str
+        :type certificate_name: str
         :param certificate_path: Upload path
-        :type str
+        :type certificate_path: str
         :param certificate_body: SSL certificate
-        :type str
+        :type certificate_body: str
         :param certificate_private_key: SSL private key
-        :type str
+        :type certificate_private_key: str
         :param certificate_chain: SSL certificate chain
-        :type str
+        :type certificate_chain: str
         :return: IAM certificate id
         :rtype str
         """

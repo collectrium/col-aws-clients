@@ -20,11 +20,11 @@ class APIGatewayClient(BaseAWSClient):
                  aws_secret_access_key):
         """
         :param region_name: AWS region name
-        :type str
+        :type region_name: str
         :param aws_access_key_id: AWS credentials
-        :type str
+        :type aws_access_key_id: str
         :param aws_secret_access_key: AWS credentials
-        :type str
+        :type aws_secret_access_key: str
         """
         super(APIGatewayClient, self).__init__(
             service='apigateway',
@@ -77,11 +77,11 @@ class APIGatewayClient(BaseAWSClient):
         """
         Deploy stage
         :param api_name: API Gateway visible name
-        :type str
+        :type api_name: str
         :param stage: stage name
-        :type str
+        :type stage: str
         :param lambda_function_name: function name for stage
-        :type str
+        :type lambda_function_name: str
         :return:
         """
         api_id = self.__get_api_id(api_name)
@@ -105,13 +105,13 @@ class APIGatewayClient(BaseAWSClient):
         """
         Create cusom domain name
         :param domain_name: custom domain name
-        :type str
+        :type domain_name: str
         :param certificate_body:   SSL certificate
-        :type str
+        :type certificate_body: str
         :param certificate_private_key: SSL private key
-        :type str
+        :type certificate_private_key: str
         :param certificate_chain: SSL certificate chain
-        :type str
+        :type certificate_chain: str
         :return:
         """
         response = self.instance.get_domain_names()
@@ -129,13 +129,13 @@ class APIGatewayClient(BaseAWSClient):
         """
         Create path mapping
         :param api_name:  API Gateway visible name
-        :type str
+        :type api_name: str
         :param stage:  stage
-        :type str
+        :type stage: str
         :param domain_name:  custom domain name
-        :type str
+        :type domain_name: str
         :param base_path: base pathn for mapping
-        :type str
+        :type base_path: str
         :return:
         """
         try:

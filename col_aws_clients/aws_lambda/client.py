@@ -186,9 +186,9 @@ class LambdaClient(BaseAWSClient):
         """
         Return function AWS ARN
         :param function_name: name
-        :type str
+        :type function_name: str
         :param version: version
-        :type str
+        :type version: str
         :return:
         """
         kwargs = dict(

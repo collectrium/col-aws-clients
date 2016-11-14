@@ -49,9 +49,9 @@ class SNSClient(BaseAWSClient):
         """
         Publish message to topic
         :param topic_name: name of SNS topic
-        :type str
+        :type topic_name: str
         :param message: message object, must be JSON serializable
-        :type str
+        :type message: str
         :param protocol: protocol type, it's
         define endpoint for SNS (AWS Lambda, SQS, HTTP and  etc)
         """
@@ -64,9 +64,9 @@ class SNSClient(BaseAWSClient):
         """
         Subscribe AWS lambda to topic
         :param topic_name: SNS topic name
-        :type str
+        :type topic_name: str
         :param function_name: lambda function name
-        :type str
+        :type function_name: str
         :return:
         """
         lambda_client = LambdaClient(**self.settings)

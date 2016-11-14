@@ -47,17 +47,17 @@ class SQSClient(BaseAWSClient):
     ):
         """
         :param queue_name: name of SQS queue
-        :type str
+        :type queue_name: str
         :param retention_time: life time for sqs task in  queue
-        :type int
+        :type retention_time: int
         :param visibility_timeout: time of lock for  another clients
-        :type int
+        :type visibility_timeout: int
         :param delay_seconds: delay before new task stay visible in queue
-        :type int
-        :dead_queue_letter: dead_letter_queue_name
-        :type str
+        :type delay_seconds: int
+        :param dead_letter_queue: dead_letter_queue_name
+        :type dead_letter_queue: str
         :param max_receive_count: value between 1 and 1,000
-        :type int
+        :type max_receive_count: int
         """
 
         response = self.instance.list_queues()
@@ -90,7 +90,7 @@ class SQSClient(BaseAWSClient):
     def get_queue_url(self, queue_name):
         """
         :param queue_name:
-        :type str
+        :type queue_name: str
         :return: queue url
         :rtype str
         """
