@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-import urlparse
+
+# noinspection PyUnresolvedReferences
+from six.moves.urllib import parse
 import boto
 import boto3
 import rsa
@@ -267,13 +269,13 @@ class S3Bucket(object):
         :return: path to object on bucket
         :rtype str
         """
-        if (url is None) or (urlparse.urlparse(url).path == url):
+        if (url is None) or (parse.urlparse(url).path == url):
             return url
-        upr = urlparse.urlparse(url)
+        upr = parse.urlparse(url)
         if not upr.scheme:
             path = url
         else:
-            path = urlparse.unquote(upr.path.encode('utf-8'))
+            path = parse.unquote(upr.path.encode('utf-8'))
         return path
 
     def make_public(self, key):

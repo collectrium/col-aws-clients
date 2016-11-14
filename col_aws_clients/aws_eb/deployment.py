@@ -4,7 +4,6 @@ import logging
 import os
 import shutil
 import tempfile
-import uuid
 import zipfile
 from random import choice
 from string import ascii_lowercase
@@ -242,7 +241,7 @@ class EBDeployer(object):
     def deploy(self, certificate_arn=None):
         """
         :param certificate_arn: IAM certificate id
-        :type str
+        :type certificate_arn: str
         :return:
         """
         for app_name, app_config in self.applications_config.items():

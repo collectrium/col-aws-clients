@@ -1,6 +1,7 @@
 import unittest
 
-import urlparse
+# noinspection PyUnresolvedReferences
+from six.moves.urllib import parse
 
 
 class BaseTest(unittest.TestCase):
@@ -66,12 +67,12 @@ jb1IvnxuEoDWNWgHcQNVNm1e+xBdQLn1SCwmftJUdO85QzFzHcntxGzHOnnQFvgX
     """
 
     def assertEqualsS3Urls(self, first_url, second_url):
-        first = urlparse.urlparse(first_url)
-        second = urlparse.urlparse(second_url)
+        first = parse.urlparse(first_url)
+        second = parse.urlparse(second_url)
         self.assertEqual(first.path, second.path)
 
-        first_qs = urlparse.parse_qs(first.query)
-        second_qs = urlparse.parse_qs(second.query)
+        first_qs = parse.parse_qs(first.query)
+        second_qs = parse.parse_qs(second.query)
         self.assertEqual(
             first_qs['AWSAccessKeyId'],
             second_qs['AWSAccessKeyId'],

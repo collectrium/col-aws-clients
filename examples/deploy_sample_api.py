@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import getopt
 import logging
 import sys
@@ -58,4 +60,4 @@ if __name__ == '__main__':
         debug_deploy(aws_access_key_id, aws_secret_access_key)
     except Exception as exc:
         import traceback; traceback.print_exc()
-        print 'Invalid usage {}'.format(exc.message)
+        print('Invalid usage {}'.format(exc.message))

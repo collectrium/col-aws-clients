@@ -142,7 +142,7 @@ class LambdaClient(BaseAWSClient):
             kwargs.update(
                 Handler=handler
             )
-        if len(kwargs.keys()) > 1:
+        if len(list(kwargs.keys())) > 1:
             self.instance.update_function_configuration(
                 **kwargs
             )

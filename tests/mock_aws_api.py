@@ -4,8 +4,9 @@ import datetime
 import json
 import random
 import string
-from cStringIO import StringIO
 
+# noinspection PyUnresolvedReferences
+from six.moves import StringIO
 import botocore
 from botocore.exceptions import ClientError
 
