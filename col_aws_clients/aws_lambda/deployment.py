@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import distutils
+import distutils.sysconfig
 import hashlib
 import logging
 import os

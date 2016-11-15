@@ -6,6 +6,7 @@ import logging
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
+import six
 
 from ..aws_client import BaseAWSClient
 
@@ -63,17 +64,18 @@ class LambdaClient(BaseAWSClient):
         role = iam.Role(role_name)
 
         LOGGER.info('Role arn `%s`', role.arn)
-        response = self.instance.create_function(
-            FunctionName=function_name,
-            Runtime='python2.7',
-            Role=role.arn,
-            Handler=handler,
-            Code=dict(
-                ZipFile=open(zip_file).read()
-            ),
-            Timeout=timeout or 60,
-            MemorySize=memory_size or 128,
-        )
+        with open(zip_file, 'rb') as f:
+            response = self.instance.create_function(
+                FunctionName=function_name,
+                Runtime='python2.7',
+                Role=role.arn,
+                Handler=handler,
+                Code=dict(
+                    ZipFile=f.read()
+                ),
+                Timeout=timeout or 60,
+                MemorySize=memory_size or 128,
+            )
         if version:
             LOGGER.info('Publish version with alias `%s`', version)
             self.publish_version_alias(
@@ -91,10 +93,11 @@ class LambdaClient(BaseAWSClient):
         :return:
         """
         LOGGER.info('Update function code `%s`', function_name)
-        response = self.instance.update_function_code(
-            FunctionName=function_name,
-            ZipFile=open(zip_file).read(),
-        )
+        with open(zip_file, 'rb') as f:
+            response = self.instance.update_function_code(
+                FunctionName=function_name,
+                ZipFile=f.read(),
+            )
         if version:
             LOGGER.info('Publish version with alias `%s`', version)
             self.publish_version_alias(
@@ -206,10 +209,16 @@ class LambdaClient(BaseAWSClient):
         :param function_name: Lambda function name
         :return:
         """
+        def _to_bytes(s):
+            if isinstance(s, six.text_type):
+                return s.encode('utf-8')
+            else:
+                return s
+
         LOGGER.info('Add API Gateway permission `%s`', function_name)
         permission = dict(
             FunctionName=function_name,
-            StatementId=hashlib.sha256(function_name).hexdigest(),
+            StatementId=hashlib.sha256(_to_bytes(function_name)).hexdigest(),
             Action="lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",
         )

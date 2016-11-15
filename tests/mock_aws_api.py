@@ -55,9 +55,9 @@ class AWSMock(object):
             try:
                 orig(self, operation_name, kwarg)
             except ClientError as cle:
-                if not (cle.message.endswith(
+                if not (cle.args[0].endswith(
                         'The security token included in the request is invalid.'
-                ) or cle.message.endswith(
+                ) or cle.args[0].endswith(
                     'The AWS Access Key Id you provided does not exist in our records.')):
                     raise cle
 

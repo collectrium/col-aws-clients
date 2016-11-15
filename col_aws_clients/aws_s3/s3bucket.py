@@ -7,6 +7,7 @@ from six.moves.urllib import parse
 import boto
 import boto3
 import rsa
+import six
 from botocore.exceptions import ClientError
 from botocore.signers import CloudFrontSigner
 
@@ -14,7 +15,7 @@ from ..aws_s3.client import S3Client
 
 
 def ensure_unicode(obj):
-    if isinstance(obj, str):
+    if isinstance(obj, six.binary_type):
         return obj.decode('utf-8')
     elif isinstance(obj, dict):
         return {k: ensure_unicode(v) for k, v in obj.items()}
@@ -109,8 +110,6 @@ class S3Bucket(object):
         :return: url
         :rtype str
         """
-
-
         if key is None:
             return
 
@@ -271,7 +270,7 @@ class S3Bucket(object):
         if not upr.scheme:
             path = url
         else:
-            path = parse.unquote(upr.path.encode('utf-8'))
+            path = parse.unquote(upr.path)
         return path
 
     def make_public(self, key):
