@@ -11,8 +11,8 @@ from time import strftime
 
 from git import Repo
 
-from ..aws_eb.client import ElasticBeanstalkClient
-from ..aws_s3.s3bucket import S3Bucket
+from ..eb.client import ElasticBeanstalkClient
+from ..s3.s3bucket import S3Bucket
 
 LOGGER = logging.getLogger(__name__)
 

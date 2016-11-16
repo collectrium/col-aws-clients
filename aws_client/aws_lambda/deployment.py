@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from git import Repo
 
 from ..aws_lambda.client import LambdaClient
-from ..aws_s3.client import S3Client
+from ..s3.client import S3Client
 
 LIB_DIRS = (
     "/lib/", "/lib64/",

@@ -6,7 +6,7 @@ import json
 from six.moves import StringIO
 from mock import patch
 
-from aws_client.aws_api_gateway.deployment import APIGatewayDeployer
+from aws_client.api_gateway.deployment import APIGatewayDeployer
 from tests.base_test import BaseTest
 from tests.mock_aws_api import AWSMock
 
