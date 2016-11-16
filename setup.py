@@ -31,13 +31,18 @@ setup(
     packages=packages,
     install_requires=reqs,
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
-    version='0.4',
+    version='0.7',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
     # use the URL to the github repo
-    download_url='https://github.com/collectrium/col-aws-clients/tarball/0.1',
+    download_url='https://github.com/collectrium/col-aws-clients/tarball/0.7',
     # I'll explain this in a second
     keywords=['AWS', 'Amazon Web Services', 'SQS', "S3", "Lambda", "APIGateway"],
     # arbitrary keywords
-    classifiers=[],
+    classifiers=[
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+    ],
 )
