@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import distutils
+import distutils.sysconfig
 import hashlib
 import logging
 import os
@@ -39,7 +40,7 @@ class LambdaPackage(object):
         :param aws_lambda_config:
          Sample lambda config:
 
-        [  'function_1': {  # function name
+        {  'function_1': {  # function name
                  'role_name':'lambda_basic_execution', # IAM role for lambda
                  'handler': 'lambda_module.function_1',  # handler
                  'shedule_expression': "rate(5 minutes)", # set for periodic
@@ -57,10 +58,10 @@ class LambdaPackage(object):
                     'psycopg2==2.5.3': ("libpq.so",)
              },
              'ignored_packages': ('tests', 'testlib', 'debug')
-        ]
-        :type list
+        }
+        :type aws_lambda_config: dict
         :param repository:
-        :type str
+        :type repository: str
         """
         self.workspace = os.path.join(tempfile.gettempdir(), (''.join(choice(
             ascii_lowercase) for _ in range(10))))
@@ -82,7 +83,7 @@ class LambdaPackage(object):
         """
         Create package
         :param additional_files: list of filepaths
-        :type str
+        :type additional_files: str
         :return:
         """
         self._add_env_libs_and_src()

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 
 import boto3
+import six
 
 from ..aws_sqs.client import SQSClient
 
@@ -80,7 +81,7 @@ class SQSQueue(object):
         entries = [
             dict(
                 MessageBody=json.dumps(msg) if not isinstance(
-                    message, basestring) else msg,
+                    message, six.string_types) else msg,
                 Id=str(idx),
 
             ) for idx, msg in enumerate(message)]

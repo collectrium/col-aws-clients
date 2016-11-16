@@ -14,11 +14,11 @@ class ElasticBeanstalkClient(BaseAWSClient):
                  aws_secret_access_key):
         """
         :param region_name:  AWS region name
-        :type str
+        :type region_name: str
         :param aws_access_key_id: AWS credentials
-        :type str
+        :type aws_access_key_id: str
         :param aws_secret_access_key: AWS credentials
-        :type str
+        :type aws_secret_access_key: str
         """
         super(ElasticBeanstalkClient, self).__init__(
             service='elasticbeanstalk',

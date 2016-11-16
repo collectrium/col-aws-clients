@@ -21,17 +21,17 @@ class APIGatewayDeployer(object):
         """
 
         :param api_name: API name
-         :type str
+        :type api_name: str
         :param swagger_file: Swagger json config
-         :type file
+        :type swagger_file: file
         :param region_name: AWS region name
-         :type str
+        :type region_name: str
         :param aws_access_key_id: AWS credentials
-         :type str
+        :type aws_access_key_id: str
         :param aws_secret_access_key: AWS credentials
-         :type str
+        :type aws_secret_access_key: str
         :param domain_name: custom  domain name
-         :type str
+        :type domain_name: str
         """
         LOGGER.info('Initialize client')
         self.client = APIGatewayClient(
@@ -94,11 +94,11 @@ class APIGatewayDeployer(object):
         Create API by swagger file and deploy stage with
         variable `lambda_function`
         :param stage: stage name
-        :type str
+        :type stage: str
         :param lambda_function_name: Lambda function name
-        :type str
+        :type lambda_function_name: str
         :param lambda_version: Lambda function version name
-        :type str
+        :type lambda_version: str
         :return:
         """
         self.__create_api()
@@ -111,15 +111,15 @@ class APIGatewayDeployer(object):
         """
         Create custom domain name and associate it with stage
         :param stage: stage name
-        :type str
+        :type stage: str
         :param base_path: base_path
-        :type str
+        :type base_path: str
         :param certificate_body: SSL certificate
-        :type str
+        :type certificate_body: str
         :param certificate_private_key: SSL certificate private key
-        :type str
+        :type certificate_private_key: str
         :param certificate_chain: SSL certificate chain
-        :type str
+        :type certificate_chain: str
         :return:
         """
         self.__create_custom_domain_name(

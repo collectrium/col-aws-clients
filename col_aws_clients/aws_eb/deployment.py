@@ -4,7 +4,6 @@ import logging
 import os
 import shutil
 import tempfile
-import uuid
 import zipfile
 from random import choice
 from string import ascii_lowercase
@@ -23,9 +22,9 @@ class EBPackage(object):
         """
         Helper to generate code package
         :param version: package code version, must be like uuid
-        :type str
+        :type version: str
         :param repository: git repository url
-        :type str
+        :type repository: str
         """
         self.repository = repository or '.'
         LOGGER.info('Repository `{}`'.format(self.repository))
@@ -41,7 +40,7 @@ class EBPackage(object):
     def create_deployment_package(self, additional_files):
         """
         Create deployment zip package
-        :param additional_filesL list of file paths
+        :param additional_files: list of file paths
         :return:
         """
         LOGGER.info('Create deployment package')
@@ -75,11 +74,11 @@ class EBDeployer(object):
         """
 
         :param region_name: AWS region_name
-        :type str
+        :type region_name: str
         :param aws_access_key_id: AWS credentials
-        :type str
+        :type aws_access_key_id: str
         :param aws_secret_access_key: AWS credentials
-        :type str
+        :type aws_secret_access_key: str
         :param applications_config:
 
         Sample config:
@@ -91,9 +90,9 @@ class EBDeployer(object):
             }
         }
         :param environment: environment name
-        :type str
+        :type environment: str
         :param zip_file: path to code package
-        :type str
+        :type zip_file: str
         """
         self.applications_config = applications_config
         self.client = ElasticBeanstalkClient(
@@ -242,7 +241,7 @@ class EBDeployer(object):
     def deploy(self, certificate_arn=None):
         """
         :param certificate_arn: IAM certificate id
-        :type str
+        :type certificate_arn: str
         :return:
         """
         for app_name, app_config in self.applications_config.items():

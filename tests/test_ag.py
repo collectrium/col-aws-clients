@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 import json
-from cStringIO import StringIO
 
+# noinspection PyUnresolvedReferences
+from six.moves import StringIO
 from mock import patch
 
 from col_aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
@@ -62,7 +63,7 @@ class AGTest(BaseTest):
     @patch('botocore.client.BaseClient._make_api_call', new=AWSMock.mock_make_api_call)
     def test_deployment(self):
         ag_deployer = APIGatewayDeployer(
-            api_name='Sample', 
+            api_name='Sample',
             region_name=self.region_name,
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key,

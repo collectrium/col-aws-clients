@@ -1,6 +1,5 @@
 import os
 import tempfile
-import zipfile
 
 from git import Repo
 from mock import patch

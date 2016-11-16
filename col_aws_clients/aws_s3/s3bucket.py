@@ -1,19 +1,21 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-import urlparse
+
+# noinspection PyUnresolvedReferences
+from six.moves.urllib import parse
 import boto
 import boto3
 import rsa
+import six
 from botocore.exceptions import ClientError
 from botocore.signers import CloudFrontSigner
 
 from ..aws_s3.client import S3Client
 
 
-
 def ensure_unicode(obj):
-    if isinstance(obj, str):
+    if isinstance(obj, six.binary_type):
         return obj.decode('utf-8')
     elif isinstance(obj, dict):
         return {k: ensure_unicode(v) for k, v in obj.items()}
@@ -37,7 +39,6 @@ class S3Bucket(object):
     ):
         """
         :param bucket_name: bucket's name
-        :param cloudfront_domain: Cloudfront domain
         """
         self.bucket_name = bucket_name
         self.client = S3Client(
@@ -53,7 +54,7 @@ class S3Bucket(object):
         """
         List objects on bucket
         :param prefix:  key prefix
-        :type str
+        :type prefix: str
         :return:
         """
         return self.client.instance.list_objects_v2(
@@ -64,9 +65,9 @@ class S3Bucket(object):
         """
         Copy object on bucket
         :param source: path to source on bucket
-        :type str
+        :type source: str
         :param destination: path to destination on bucket
-        :type str
+        :type destination: str
         :return:
         """
         kwargs = dict(
@@ -81,11 +82,11 @@ class S3Bucket(object):
         """
         Copy from another S3 bucket
         :param source_bucket: source bucket's name
-        :type str
+        :type source_bucket: str
         :param source: path  to object on source bucket
-        :type str
+        :type source: str
         :param destination:  path to destination on self bucket
-         :type str
+        :type destination: str
         :return:
         """
         kwargs = dict(
@@ -105,14 +106,12 @@ class S3Bucket(object):
         :param url_expiration_time: time until url expires in seconds
         :type url_expiration_time: int
         :param key:  path to object on bucket
-        :type str
+        :type key: str
         :param content_type: content-type for object
-        :type str
+        :type content_type: str
         :return: url
         :rtype str
         """
-
-
         if key is None:
             return
 
@@ -157,8 +156,6 @@ class S3Bucket(object):
         :param url_expiration_time: time until url expires in seconds
         :type url_expiration_time: int
         :param key:  path to object on bucket
-        :param cloudfront:  return url to cloudfront instead of s3
-        :type str
         :return: url
         :rtype str
         """
@@ -197,9 +194,9 @@ class S3Bucket(object):
         """
         Upload file on bucket from local storage
         :param filepath: path to file on local storage
-        :type str
+        :type filepath: str
         :param key: path to object on bucket
-        :type str
+        :type key: str
         :return: presigned url for object
         :rtype str
         """
@@ -211,7 +208,7 @@ class S3Bucket(object):
         Create object on bucket and put payload data or stream data to it
         :param payload: byte string or file object
         :param key: path to object on bucket
-        :type str
+        :type key: str
         :return: presigned url for object
         :rtype str
         """
@@ -246,7 +243,7 @@ class S3Bucket(object):
         :param key: path to object on bucket
         :type key: str
         :return: stream, content-length
-        :rtype : tuple
+        :rtype: tuple
         """
         response = self.client.instance.get_object(
             Bucket=self.bucket_name,
@@ -258,7 +255,7 @@ class S3Bucket(object):
         """
         Remove object from bucket
         :param key:  path to object on bucket
-        :type str
+        :type key: str
         """
         self.client.instance.delete_object(Bucket=self.bucket_name, Key=key)
 
@@ -267,24 +264,24 @@ class S3Bucket(object):
         """
         Get path to object on bucket from presigned url
         :param url: presigned url
-        :type: str
+        :type url: str
         :return: path to object on bucket
         :rtype str
         """
-        if (url is None) or (urlparse.urlparse(url).path == url):
+        if (url is None) or (parse.urlparse(url).path == url):
             return url
-        upr = urlparse.urlparse(url)
+        upr = parse.urlparse(url)
         if not upr.scheme:
             path = url
         else:
-            path = urlparse.unquote(upr.path.encode('utf-8'))
+            path = parse.unquote(upr.path)
         return path
 
     def make_public(self, key):
         """
         Set public-read ACL for key
         :param key: path to objecton bucket
-        :type str
+        :type key: str
         """
         self.client.instance.put_object_acl(
             ACL='public-read',
@@ -296,7 +293,7 @@ class S3Bucket(object):
         """
         Set bucket-owner-full-control ACL for key
         :param key: path to object on bucket
-        :type str
+        :type key: str
         """
         self.client.instance.put_object_acl(
             ACL='bucket-owner-full-control',

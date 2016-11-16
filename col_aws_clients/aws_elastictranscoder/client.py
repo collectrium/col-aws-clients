@@ -36,17 +36,17 @@ class ElasticTranscoderClient(BaseAWSClient):
             thumbnail_height=270,
     ):
         """
-        Create video trnsforming presets
+        Create video transforming presets
         :param preset_name: name
-        :type str
+        :type preset_name: str
         :param width: max output video width
-        :type int
+        :type width: int
         :param height: max output video height
-        :type int
+        :type height: int
         :param thumbnail_width: max thumbnail video width
-        :type int
+        :type thumbnail_width: int
         :param thumbnail_height:  max thumbnail video height
-        :type int
+        :type thumbnail_height: int
         :return:
         """
 
@@ -101,18 +101,18 @@ class ElasticTranscoderClient(BaseAWSClient):
         """
         Create pipeline
         :param pipeline_name: name
-        :type str
+        :type pipeline_name: str
         :param bucket_name: working bucket name
-        :type str
+        :type bucket_name: str
         :param role_name:  IAM role name for transcoding
-        :type  str
+        :type role_name: str
           SNS topic for sending notifications
         :param progressing_sns_topic: for progressing
-        :type str
+        :type progressing_sns_topic: str
         :param completed_sns_topic:  for completed
-        :type str
+        :type completed_sns_topic: str
         :param warning_sns_topic:  for warning
-        :type str
+        :type warning_sns_topic: str
         :param error_sns_topic:  for error
         :return:
         """
@@ -180,7 +180,7 @@ class ElasticTranscoderClient(BaseAWSClient):
         :param pipeline_id: pipeline id
         :param input_key:
         :param output_key:
-        :param preset:
+        :param preset_id:
         :return:
         """
         kwargs = dict(

@@ -22,14 +22,14 @@ class LambdaFunction(object):
                  version=None):
         """
         :param function_name: AWS Lambda function name
-        :type str
+        :type function_name: str
         :param region_name  AWS region
-        :type str
+        :type region_name: str
         :param aws_access_key_id
-        :type str
+        :type aws_access_key_id: str
         :param aws_secret_access_key
-        :type str
-         :rtype str
+        :type aws_secret_access_key: str
+        :rtype str
         """
         self.client = LambdaClient(
             region_name=region_name,
