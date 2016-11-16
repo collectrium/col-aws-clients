@@ -1,6 +1,6 @@
 import json
 
-from col_aws_clients.aws_lambda.client import LambdaClient
+from aws_client.aws_lambda.client import LambdaClient
 from ..aws_client import BaseAWSClient
 
 

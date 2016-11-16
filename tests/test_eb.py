@@ -3,7 +3,7 @@ import zipfile
 
 from mock import patch
 
-from col_aws_clients.aws_eb.deployment import EBDeployer
+from aws_client.aws_eb.deployment import EBDeployer
 from tests.base_test import BaseTest
 from tests.mock_aws_api import AWSMock
 

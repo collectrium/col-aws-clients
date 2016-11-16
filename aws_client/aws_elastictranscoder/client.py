@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import boto3
 
-from col_aws_clients.aws_sns.client import SNSClient
+from aws_client.aws_sns.client import SNSClient
 from ..aws_client import BaseAWSClient
 
 

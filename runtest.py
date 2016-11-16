@@ -11,7 +11,7 @@ if __name__ == '__main__':
             argv=[
                 os.path.abspath(__file__),
                 "--with-coverage",
-                "--cover-package=col_aws_clients",
+                "--cover-package=aws_client",
                 "--cover-erase",
             ]
         )

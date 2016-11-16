@@ -8,8 +8,8 @@ import zipfile
 # logger = logging.getLogger('AWSClients')
 # fh = logging.FileHandler('deploy.log')
 # logger.addHandler(fh)
-from col_aws_clients.aws_api_gateway.deployment import APIGatewayDeployer
-from col_aws_clients.aws_lambda.deployment import LambdaDeployer
+from aws_client.aws_api_gateway.deployment import APIGatewayDeployer
+from aws_client.aws_lambda.deployment import LambdaDeployer
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
