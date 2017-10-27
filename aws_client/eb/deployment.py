@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import logging
 import os
@@ -244,7 +244,7 @@ class EBDeployer(object):
         :type certificate_arn: str
         :return:
         """
-        for app_name, app_config in self.applications_config.items():
+        for app_name, app_config in list(self.applications_config.items()):
             self.__create_applications(app_name)
             self.__create_applications_version(app_name)
             args = [app_name, app_config]

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from datetime import datetime, timedelta
 
@@ -18,7 +18,7 @@ def ensure_unicode(obj):
     if isinstance(obj, six.binary_type):
         return obj.decode('utf-8')
     elif isinstance(obj, dict):
-        return {k: ensure_unicode(v) for k, v in obj.items()}
+        return {k: ensure_unicode(v) for k, v in list(obj.items())}
     elif isinstance(obj, list):
         return [ensure_unicode(item) for item in obj]
     else:
