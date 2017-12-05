@@ -20,7 +20,7 @@ class LambdaTest(BaseTest):
                            self.aws_access_key_id,
                            self.aws_secret_access_key
                            )
-        result = l(payload={'test': 1}, async=False)
+        result = l(payload={'test': 1}, async_call=False)
 
     @unittest.skip('takes forever and hangs')
     @patch('botocore.client.BaseClient._make_api_call',

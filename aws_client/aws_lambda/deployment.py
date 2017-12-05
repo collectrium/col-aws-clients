@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import distutils
 import distutils.sysconfig
@@ -117,7 +117,7 @@ class LambdaPackage(object):
                     for module in modules:
                         for shared_object in (
                                 lib for libs
-                                in requirements.values() for lib in libs
+                                in list(requirements.values()) for lib in libs
                         ):
                             if shared_object in module:
                                 so_files.append(os.path.join(lib_dir, module))
@@ -138,7 +138,7 @@ class LambdaPackage(object):
             subprocess.call(['virtualenv {}'.format(pkg_venv)], shell=True)
             subprocess.call(['find . -name "*.pyc" -exec rm -rf {} \\;'],
                             shell=True)
-            for package in requirements.keys():
+            for package in list(requirements.keys()):
                 cmd = [os.path.join(pkg_venv, venv_pip), ]
                 cmd.append(' install --upgrade --force-reinstall ')
                 cmd.extend(('--global-option=build_ext',
@@ -244,7 +244,7 @@ class LambdaDeployer(object):
         self._add_triggers()
 
     def _upload(self):
-        for function_name, function_config in self.lambda_config.items():
+        for function_name, function_config in list(self.lambda_config.items()):
             try:
                 function_arn = self.client.update_lambda_function_code(
                     function_name,
@@ -266,7 +266,7 @@ class LambdaDeployer(object):
     def _set_shedule(self):
         settings = self.client.settings
         client = boto3.client('events', **settings)
-        for function_name, function_config in self.lambda_config.items():
+        for function_name, function_config in list(self.lambda_config.items()):
             expression = function_config.get('shedule_expression')
             if expression:
                 response = client.put_rule(
@@ -297,7 +297,7 @@ class LambdaDeployer(object):
                     pass
 
     def _add_permissions(self):
-        for function_name, function_config in self.lambda_config.items():
+        for function_name, function_config in list(self.lambda_config.items()):
             event_sources = function_config.get('event_sources', None)
             try:
                 if event_sources and 's3' in event_sources:
@@ -318,7 +318,7 @@ class LambdaDeployer(object):
     def _add_triggers(self):
         s3 = None
         notifications_specs = {}
-        for function_name, function_config in self.lambda_config.items():
+        for function_name, function_config in list(self.lambda_config.items()):
             event_sources = function_config.get('event_sources', None)
             if event_sources and 's3' in event_sources:
                 s3 = s3 or S3Client(
@@ -349,7 +349,7 @@ class LambdaDeployer(object):
                     }
                 )
 
-        for bucket_name, configurations in notifications_specs.items():
+        for bucket_name, configurations in list(notifications_specs.items()):
             try:
                 s3.instance.put_bucket_notification_configuration(
                     Bucket=bucket_name,
