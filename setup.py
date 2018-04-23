@@ -1,21 +1,28 @@
 #!/usr/bin/env python
 import pip
+from collections import namedtuple
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
 
 
-try:
-    install_reqs = parse_requirements(
-        "requirements.txt",
-        session=pip.download.PipSession(),
-    )
-except AttributeError:
-    #for pip==1.4.1
-    install_reqs = parse_requirements("requirements.txt")
+def parse_requirements(filename):
+    """ load requirements from a pip requirements file """
+    Requirements = namedtuple('Requirements', ('pypi', 'links'))
+    lineiter = (line.strip() for line in open(filename))
+    parsed_reqs = [line for line in lineiter if
+                   line and not line.startswith("#")]
 
-reqs = [str(ir.req) for ir in install_reqs if ir.req]
+    result = Requirements(pypi=[], links=[])
+
+    for _l in parsed_reqs:
+        if _l.startswith('git+'):
+            result.links.append(_l)
+        else:
+            result.pypi.append(_l)
+
+    return result
 
 
+reqs = parse_requirements('requirements.txt')
 
 packages = find_packages(
     exclude=[
@@ -29,7 +36,8 @@ setup(
     author='collectrium',
     author_email='support@collectrium.com',
     packages=packages,
-    install_requires=reqs,
+    install_requires=reqs.pypi,
+    dependency_links=reqs.links,
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
     version='0.9',
     description='Collectrium AWS clients',
@@ -37,7 +45,8 @@ setup(
     # use the URL to the github repo
     download_url='https://github.com/collectrium/col-aws-clients/tarball/0.9',
     # I'll explain this in a second
-    keywords=['AWS', 'Amazon Web Services', 'SQS', "S3", "Lambda", "APIGateway"],
+    keywords=['AWS', 'Amazon Web Services', 'SQS', "S3", "Lambda",
+              "APIGateway"],
     # arbitrary keywords
     classifiers=[
         'Programming Language :: Python :: 2',
