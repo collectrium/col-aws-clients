@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import pip
 from collections import namedtuple
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def parse_requirements(filename):
@@ -39,19 +39,15 @@ setup(
     install_requires=reqs.pypi,
     dependency_links=reqs.links,
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
-    version='0.9',
+    version='0.10',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
-    # use the URL to the github repo
-    download_url='https://github.com/collectrium/col-aws-clients/tarball/0.9',
-    # I'll explain this in a second
     keywords=['AWS', 'Amazon Web Services', 'SQS', "S3", "Lambda",
               "APIGateway"],
-    # arbitrary keywords
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )
