@@ -39,14 +39,14 @@ class LambdaFunction(object):
         self.function_name = function_name
         self.version = version
 
-    def __call__(self, payload, async=True):
+    def __call__(self, payload, async_call=True):
         """
         :param payload: payload object, must be json serializable
-        :param async: Flag for async call
-        :return: None for async call or AWS Lambda function result
+        :param async_call: Flag for async call
+        :return: None for async_call call or AWS Lambda function result
         """
 
-        invocation = "Event" if async else "RequestResponse"
+        invocation = "Event" if async_call else "RequestResponse"
         start_time = time.time()
         kwargs = dict(
             FunctionName=self.function_name,
@@ -59,7 +59,7 @@ class LambdaFunction(object):
         response = self.client.instance.invoke(**kwargs)
         LOGGER.info("Lambda)invoking time %s",
                     str(time.time() - start_time))
-        if not async and 'Payload' in response:
+        if not async_call and 'Payload' in response:
             result = response['Payload'].read()
             LOGGER.info('Receive result %s', str((result)))
             return result

@@ -39,7 +39,7 @@ setup(
     install_requires=reqs.pypi,
     dependency_links=reqs.links,
     package_data={'': ['*.ini', '*.txt', '*.html', '*.json', '*.yml', '*.csv']},
-    version='0.10',
+    version='0.11',
     description='Collectrium AWS clients',
     url='https://github.com/collectrium/col-aws-clients',
     keywords=['AWS', 'Amazon Web Services', 'SQS', "S3", "Lambda",
